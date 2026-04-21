@@ -2,31 +2,20 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { IconButton } from '@mui/material';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Button from './Button';
 
 const images = [
     {
-        src: '/slides/banner1.png',
-        title: 'Future of Footwear',
-        subtitle: 'Step into the next generation of style and comfort.',
+        src: '/slides/adidas_banner_1.png',
+        title: 'TINGKATKAN PERMAINANMU',
+        subtitle: 'Koleksi terbaru untuk performa maksimal di setiap langkah.',
+        cta: 'BELANJA SEKARANG',
     },
     {
-        src: '/slides/banner2.png',
-        title: 'Timeless Elegance',
-        subtitle: 'Classic silhouettes reimagined for the modern era.',
-    },
-    {
-        src: '/slides/banner3.png',
-        title: 'Urban Essentials',
-        subtitle: 'Crafted for the city, designed for you.',
-    },
-    {
-        src: '/slides/banner4.png',
-        title: 'Art in Motion',
-        subtitle: 'Where fashion meets abstract expressionism.',
+        src: '/slides/adidas_banner_2.png',
+        title: 'GAYA JALANAN AUTENTIK',
+        subtitle: 'Temukan siluet klasik yang didefinisikan ulang untuk masa kini.',
+        cta: 'LIHAT KOLEKSI',
     },
 ];
 
@@ -42,15 +31,15 @@ export default function Carousel() {
     };
 
     useEffect(() => {
-        const interval = setInterval(nextSlide, 10000);
+        const interval = setInterval(nextSlide, 8000);
         return () => clearInterval(interval);
     }, [nextSlide]);
 
     return (
-        <section className="relative w-full h-[300px] md:h-[450px] overflow-hidden group">
+        <section className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-[#ebedee]">
             {/* Slides */}
             <div
-                className="flex transition-transform duration-700 ease-in-out h-full"
+                className="flex transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)] h-full"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
                 {images.map((image, index) => (
@@ -59,54 +48,63 @@ export default function Carousel() {
                             src={image.src}
                             alt={image.title}
                             fill
-                            className="object-cover"
+                            className="object-cover object-center"
                             priority={index === 0}
                         />
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-black/30 flex flex-col justify-end p-6 md:p-8 bg-gradient-to-t from-black/60 to-transparent">
-                            <div className={`transition-all duration-1000 transform ${currentIndex === index ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tighter uppercase italic">
+                        {/* Adidas Style Overlay */}
+                        <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-20 lg:px-32">
+                            <div className={`max-w-xl transition-all duration-1000 delay-300 transform ${currentIndex === index ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
+                                <h2 className="text-4xl md:text-6xl font-[900] text-black mb-4 tracking-tighter leading-none bg-white inline-block px-4 py-2 uppercase italic shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                                     {image.title}
                                 </h2>
-                                <p className="text-lg md:text-xl text-gray-200 max-w-2xl mb-6 font-light">
-                                    {image.subtitle}
-                                </p>
-                                <Button text="Explore More" />
+                                <div className="mt-6 mb-8">
+                                    <p className="text-lg md:text-xl text-black font-bold bg-white inline-block px-3 py-1 uppercase tracking-tight">
+                                        {image.subtitle}
+                                    </p>
+                                </div>
+                                <div className="flex space-x-4">
+                                    <Button text={image.cta} />
+                                </div>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Navigation Buttons */}
-            <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                <IconButton
+            {/* Navigation Arrows (Adidas Style) */}
+            <div className="absolute bottom-10 right-10 md:right-20 flex space-x-1 z-20">
+                <button
                     onClick={prevSlide}
-                    className="bg-white/20 hover:bg-white/40 text-white pointer-events-auto backdrop-blur-sm"
-                    size="large"
+                    className="w-12 h-12 bg-white border border-black flex items-center justify-center hover:bg-gray-100 transition-colors"
                 >
-                    <ArrowBackIosNewIcon />
-                </IconButton>
-                <IconButton
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5">
+                        <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                </button>
+                <button
                     onClick={nextSlide}
-                    className="bg-white/20 hover:bg-white/40 text-white pointer-events-auto backdrop-blur-sm"
-                    size="large"
+                    className="w-12 h-12 bg-white border border-black border-l-0 flex items-center justify-center hover:bg-gray-100 transition-colors"
                 >
-                    <ArrowForwardIosIcon />
-                </IconButton>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
             </div>
 
-            {/* Indicators */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex space-x-3">
-                {images.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setCurrentIndex(index)}
-                        className={`h-1.5 transition-all duration-300 rounded-full ${currentIndex === index ? 'w-12 bg-white' : 'w-3 bg-white/50 hover:bg-white/80'}`}
-                        aria-label={`Go to slide ${index + 1}`}
-                    />
-                ))}
+            {/* Progress Indicators */}
+            <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gray-300 z-20">
+                <div
+                    className="h-full bg-black transition-all duration-[8000ms] ease-linear"
+                    style={{
+                        width: '100%',
+                        transform: `scaleX(${1 / images.length})`,
+                        transformOrigin: 'left',
+                        transition: currentIndex === 0 ? 'none' : 'transform 8000ms linear'
+                    }}
+                    key={currentIndex}
+                />
             </div>
         </section>
     );
 }
+

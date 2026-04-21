@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Connexxa - E-Commerce Fashion Store
 
-## Getting Started
+Connexxa adalah aplikasi web e-commerce fashion modern yang dibangun dengan Next.js, dirancang untuk memberikan pengalaman berbelanja yang mulus dan premium. Proyek ini mengusung estetika desain yang bersih dan responsif, terinspirasi oleh platform brand olahraga ternama.
 
-First, run the development server:
+## 🚀 Teknologi Utama
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Library**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) & [Emotion](https://emotion.sh/)
+- **Icons**: [Material UI Icons](https://mui.com/material-ui/material-icons/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Fitur Utama
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Desain Responsif**: Antarmuka yang dioptimalkan untuk perangkat mobile dan desktop.
+- **Navigasi Dinamis**: Kategori produk yang mudah diakses (KAOS, CELANA, SEPATU, JAKET).
+- **Hero Carousel**: Banner interaktif di halaman utama untuk promosi.
+- **Header Premium**: Dilengkapi dengan fitur pencarian, profil pengguna, dan keranjang belanja.
+- **Sistem Menu**: Slide-out menu khusus untuk pengguna perangkat mobile.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Pengembangan
 
-## Learn More
+### Persyaratan
+- Node.js versi terbaru
+- npm atau yarn
 
-To learn more about Next.js, take a look at the following resources:
+### Instalasi & Menjalankan Lokal
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Clone repositori ini.
+2. Instal dependensi:
+   ```bash
+   npm install
+   ```
+3. Jalankan server pengembangan:
+   ```bash
+   npm run dev
+   ```
+4. Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Struktur Folder
 
-## Deploy on Vercel
+- `app/`: Routing dan halaman aplikasi.
+- `components/`: Komponen UI yang dapat digunakan kembali (Header, Button, Carousel, dll).
+- `public/`: Aset statis seperti gambar dan ikon.
+- `lib/`: Utilitas dan konfigurasi pendukung.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

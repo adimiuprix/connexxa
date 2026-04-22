@@ -13,7 +13,7 @@ const NavLink = () => {
                 <Link
                     key={item.href}
                     href={item.href}
-                    className={`text-[14px] font-bold tracking-[0.05em] h-full flex items-center px-4 transition-all relative group ${item.label === 'SALE' ? 'text-red-600' : 'text-black'
+                    className={`text-[14px] font-bold tracking-[0.05em] h-full flex items-center px-3 transition-all relative group ${item.label === 'SALE' ? 'text-red-600' : 'text-black'
                         }`}
                 >
                     <span className="relative z-10">{item.label}</span>

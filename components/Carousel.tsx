@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Button from './Button';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const images = [
     {
@@ -21,6 +23,8 @@ const images = [
 
 export default function Carousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const container = useRef<HTMLElement>(null);
+    const progressRef = useRef<HTMLDivElement>(null);
 
     const nextSlide = useCallback(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -35,25 +39,57 @@ export default function Carousel() {
         return () => clearInterval(interval);
     }, [nextSlide]);
 
+    useGSAP(() => {
+        images.forEach((_, index) => {
+            if (index === currentIndex) {
+                // Active slide
+                gsap.to(`.slide-${index}`, { opacity: 1, zIndex: 10, duration: 1, ease: 'power2.inOut' });
+                
+                // Zoom effect on image
+                gsap.fromTo(`.image-${index}`, 
+                    { scale: 1 }, 
+                    { scale: 1.05, duration: 8, ease: 'none' }
+                );
+
+                // Text animation (translateY + opacity)
+                gsap.fromTo(`.text-${index}`,
+                    { y: 30, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 1, delay: 0.3, ease: 'power3.out' }
+                );
+            } else {
+                // Inactive slides
+                gsap.to(`.slide-${index}`, { opacity: 0, zIndex: 0, duration: 1, ease: 'power2.inOut' });
+            }
+        });
+
+        // Progress indicator animation
+        if (progressRef.current) {
+            gsap.fromTo(progressRef.current,
+                { scaleX: 0 },
+                { scaleX: 1, duration: 8, ease: 'none' }
+            );
+        }
+    }, { dependencies: [currentIndex], scope: container });
+
     return (
-        <section className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-[#ebedee]">
+        <section ref={container} className="relative w-full h-[500px] md:h-[650px] overflow-hidden bg-[#ebedee]">
             {/* Slides */}
-            <div
-                className="flex transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)] h-full"
-                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-            >
+            <div className="relative w-full h-full">
                 {images.map((image, index) => (
-                    <div key={index} className="min-w-full h-full relative">
+                    <div
+                        key={index}
+                        className={`slide slide-${index} absolute inset-0 w-full h-full opacity-0 z-0`}
+                    >
                         <Image
                             src={image.src}
                             alt={image.title}
                             fill
-                            className="object-cover object-center"
+                            className={`image-${index} object-cover object-center`}
                             priority={index === 0}
                         />
                         {/* Adidas Style Overlay */}
-                        <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-20 lg:px-32">
-                            <div className={`max-w-xl transition-all duration-1000 delay-300 transform ${currentIndex === index ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
+                        <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-20 lg:px-32 z-20">
+                            <div className={`text-${index} max-w-xl opacity-0 translate-y-8`}>
                                 <h2 className="text-4xl md:text-6xl font-[900] text-black mb-4 tracking-tighter leading-none bg-white inline-block px-4 py-2 uppercase italic shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                                     {image.title}
                                 </h2>
@@ -94,14 +130,8 @@ export default function Carousel() {
             {/* Progress Indicators */}
             <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gray-300 z-20">
                 <div
-                    className="h-full bg-black transition-all duration-[8000ms] ease-linear"
-                    style={{
-                        width: '100%',
-                        transform: `scaleX(${1 / images.length})`,
-                        transformOrigin: 'left',
-                        transition: currentIndex === 0 ? 'none' : 'transform 8000ms linear'
-                    }}
-                    key={currentIndex}
+                    ref={progressRef}
+                    className="h-full bg-black origin-left"
                 />
             </div>
         </section>

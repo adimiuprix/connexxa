@@ -8,9 +8,9 @@ const BrandStory = () => {
         <section className="w-full bg-white">
             <div className="relative w-full h-[600px] md:h-[700px] flex overflow-hidden">
                 {/* 3 Panel Logic */}
-                <div className="grid grid-cols-1 md:grid-cols-3 w-full h-full">
+                <div className="grid grid-cols-1 lg:grid-cols-3 w-full h-full">
                     {/* Panel 1 */}
-                    <div className="relative h-full w-full">
+                    <div className="hidden lg:block relative h-full w-full">
                         <img 
                             src="https://images.unsplash.com/photo-1518002171953-a080ee817e1f?q=80&w=800&auto=format&fit=crop" 
                             alt="Adidas Fabric Detail"
@@ -18,7 +18,7 @@ const BrandStory = () => {
                         />
                     </div>
                     {/* Panel 2 */}
-                    <div className="relative h-full w-full border-l border-white/10">
+                    <div className="relative h-full w-full lg:border-l lg:border-white/10">
                         <img 
                             src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?q=80&w=800&auto=format&fit=crop" 
                             alt="Shoe Detail"
@@ -26,7 +26,7 @@ const BrandStory = () => {
                         />
                     </div>
                     {/* Panel 3 */}
-                    <div className="relative h-full w-full">
+                    <div className="hidden lg:block relative h-full w-full lg:border-l lg:border-white/10">
                         <img 
                             src="/brand_story_3.png" 
                             alt="Shoe Side Profile"

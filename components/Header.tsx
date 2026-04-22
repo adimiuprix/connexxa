@@ -35,7 +35,7 @@ const Header = () => {
             <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
             {/* Main Header */}
-            <div className="flex items-center justify-between px-4 lg:px-10 h-12 lg:h-20 max-w-[1920px] mx-auto relative bg-white">
+            <div className="flex items-center justify-between px-4 lg:px-10 h-12 lg:h-16 max-w-[1920px] mx-auto relative bg-white">
 
                 {/* Left Side: Logo (Desktop: Left, Mobile: Left) */}
                 <div className="flex items-center space-x-4">

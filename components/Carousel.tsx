@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
-import Button from './Button';
+import ButtonDark from './ButtonDark';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -44,10 +44,10 @@ export default function Carousel() {
             if (index === currentIndex) {
                 // Active slide
                 gsap.to(`.slide-${index}`, { opacity: 1, zIndex: 10, duration: 1, ease: 'power2.inOut' });
-                
+
                 // Zoom effect on image
-                gsap.fromTo(`.image-${index}`, 
-                    { scale: 1 }, 
+                gsap.fromTo(`.image-${index}`,
+                    { scale: 1 },
                     { scale: 1.05, duration: 8, ease: 'none' }
                 );
 
@@ -99,7 +99,7 @@ export default function Carousel() {
                                     </p>
                                 </div>
                                 <div className="flex space-x-4">
-                                    <Button text={image.cta} />
+                                    <ButtonDark text={image.cta} />
                                 </div>
                             </div>
                         </div>

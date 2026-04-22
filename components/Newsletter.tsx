@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Button from './Button';
+import ButtonDark from './ButtonDark';
 
 const Newsletter = () => {
     return (
@@ -10,7 +10,7 @@ const Newsletter = () => {
                 GABUNG ADICLUB & DAPATKAN DISKON 15%
             </h2>
             <div className="flex-shrink-0">
-                <Button text="DAFTAR SEKARANG" />
+                <ButtonDark text="DAFTAR SEKARANG" />
             </div>
         </section>
     );

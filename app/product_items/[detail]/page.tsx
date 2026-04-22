@@ -27,7 +27,7 @@ const sizeOptions = [
     { label: 'S', value: 'S' },
     { label: 'M', value: 'M' },
     { label: 'L', value: 'L' },
-    { label: 'XL', value: 'XL' },
+    { label: 'XL', value: 'XL', disabled: false },
     { label: '2XL', value: '2XL', disabled: true },
 ];
 

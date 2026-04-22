@@ -7,7 +7,7 @@ const Footer = () => {
     const footerSections = [
         {
             title: 'PRODUK',
-            links: ['Sepatu', 'Pakaian', 'Aksesori', 'Hot Sale'],
+            links: ['Sepatu', 'Pakaian', 'Aksesori', 'Celana Pendek'],
         },
         {
             title: 'DUKUNGAN',
@@ -44,7 +44,7 @@ const Footer = () => {
                 <div className="max-w-[1920px] mx-auto px-4 flex flex-col md:flex-row justify-center items-center md:space-x-8 space-y-4 md:space-y-0">
                     <Link href="#" className="hover:text-white hover:underline transition-colors">Kebijakan Privasi</Link>
                     <span className="hidden md:block">|</span>
-                    <Link href="#" className="hover:text-white hover:underline transition-colors">Syarat dan Ketentuan</Link>
+                    <Link href="/terms_and_conditions" className="hover:text-white hover:underline transition-colors">Syarat dan Ketentuan</Link>
                     <span className="hidden md:block">|</span>
                     <Link href="#" className="hover:text-white hover:underline transition-colors">Informasi Hukum</Link>
                     <span className="hidden md:block">|</span>

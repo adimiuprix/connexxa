@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Oswald } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 
 import Footer from "@/components/Footer";
 
-const oswald = Oswald({
-    variable: "--font-oswald",
+const poppins = Poppins({
+    variable: "--font-poppins",
     subsets: ["latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
-            className={`${oswald.variable} h-full antialiased`}
+            className={`${poppins.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col">
                 <Header />

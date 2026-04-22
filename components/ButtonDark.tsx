@@ -4,7 +4,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 const ButtonDark = ({ text, outline = false }: { text: string; outline?: boolean }) => {
     if (outline) {
         return (
-            <button className="group relative flex items-center bg-white text-black px-6 py-3 border border-black font-bold uppercase tracking-widest text-[13px] hover:text-gray-500 transition-colors duration-200">
+            <button className="group relative flex items-center bg-white text-black px-6 py-3 border border-black font-bold uppercase tracking-widest text-[13px] hover:text-gray-600 transition-colors duration-200">
                 <span>{text}</span>
                 <ArrowForwardIcon className="ml-3 transition-transform duration-200 group-hover:translate-x-1" sx={{ fontSize: 20 }} />
             </button>
@@ -12,7 +12,7 @@ const ButtonDark = ({ text, outline = false }: { text: string; outline?: boolean
     }
 
     return (
-        <button className="group relative flex items-center bg-black text-white px-6 py-3 font-bold uppercase tracking-widest text-[13px] hover:text-gray-600 transition-colors duration-200">
+        <button className="group relative flex items-center bg-black text-white px-6 py-3 font-bold uppercase tracking-widest text-[13px] hover:text-gray-400 transition-colors duration-200">
             <span>{text}</span>
             <ArrowForwardIcon className="ml-3 transition-transform duration-200 group-hover:translate-x-1" sx={{ fontSize: 20 }} />
             {/* Box shadow effect simulation logic */}

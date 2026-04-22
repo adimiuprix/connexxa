@@ -149,12 +149,6 @@ const CategoryCard = ({ cat }: { cat: any }) => {
 
             {/* Magnetic Block Text Reveal & Philosophy */}
             <div className="absolute bottom-8 left-8 z-10 flex flex-col items-start pointer-events-none">
-                <div className="category-text-container overflow-hidden bg-white shadow-2xl relative mb-2">
-                    <div className="absolute inset-0 bg-black category-text-bg" />
-                    <span className="relative z-10 px-8 py-3 block font-black text-xl md:text-2xl tracking-[0.2em] uppercase italic category-text text-black">
-                        {cat.title}
-                    </span>
-                </div>
                 <span className="philosophy-text text-white/90 text-xs md:text-sm tracking-widest font-medium drop-shadow-md">
                     {cat.philosophy}
                 </span>

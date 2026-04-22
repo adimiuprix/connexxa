@@ -28,7 +28,6 @@ const Header = () => {
                 <a href="#" className="hover:underline">pencari toko</a>
                 <a href="#" className="hover:underline">bantuan</a>
                 <a href="#" className="hover:underline">pelacak pesanan</a>
-                <a href="#" className="hover:underline">adiclub</a>
             </div>
 
             {/* Mobile Menu Sidebar */}

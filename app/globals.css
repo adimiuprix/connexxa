@@ -10,7 +10,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-adidas-blue: var(--adidas-blue);
-  --font-sans: "AdihausDIN", "Helvetica", "Arial", sans-serif;
+  --font-sans: var(--font-oswald), "Helvetica", "Arial", sans-serif;
 }
 
 body {

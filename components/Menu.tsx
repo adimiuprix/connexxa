@@ -1,5 +1,7 @@
 import React from 'react';
+import Link from 'next/link';
 import CloseIcon from '@mui/icons-material/Close';
+import { menuItems } from '@/libs/MenuItem';
 
 interface MenuProps {
     isOpen: boolean;
@@ -7,6 +9,7 @@ interface MenuProps {
 }
 
 const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
+
     return (
         <div className={`fixed inset-0 z-50 transition-all duration-300 ${isOpen ? 'visible' : 'invisible'}`}>
             {/* Overlay */}
@@ -25,13 +28,13 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div className="py-6 px-4">
                     <ul className="space-y-6">
-                        <li><a href="#" onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">SEPATU</a></li>
-                        <li><a href="#" onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">PRIA</a></li>
-                        <li><a href="#" onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">WANITA</a></li>
-                        <li><a href="#" onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">ANAK</a></li>
-                        <li><a href="#" onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">OLAHRAGA</a></li>
-                        <li><a href="#" onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">BRANDS</a></li>
-                        <li><a href="#" onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">OUTLET</a></li>
+                        {menuItems.map((item) => (
+                            <li key={item.label}>
+                                <Link href={item.href} onClick={onClose} className="text-lg text-gray-600 font-bold hover:underline block text-gray-900">
+                                    {item.label}
+                                </Link>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>

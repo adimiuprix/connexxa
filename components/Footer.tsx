@@ -7,23 +7,15 @@ const Footer = () => {
     const footerSections = [
         {
             title: 'PRODUK',
-            links: ['Sepatu', 'Pakaian', 'Aksesori', 'Rilisan Terbaru', 'Sale'],
-        },
-        {
-            title: 'OLAHRAGA',
-            links: ['Sepak Bola', 'Lari', 'Training', 'Tenis', 'Basket'],
-        },
-        {
-            title: 'KOLEKSI',
-            links: ['Ultraboost', 'Stan Smith', 'Samba', 'Gazelle', 'Predator'],
+            links: ['Sepatu', 'Pakaian', 'Aksesori', 'Hot Sale'],
         },
         {
             title: 'DUKUNGAN',
-            links: ['Bantuan', 'Pelacak Pesanan', 'Pencari Toko', 'adiclub', 'Pengembalian'],
+            links: ['Bantuan', 'Pelacak Pesanan', 'Pencari Toko', 'Pengembalian'],
         },
         {
             title: 'INFO PERUSAHAAN',
-            links: ['Tentang Kami', 'Karier', 'Press', 'Hubungan Investor', 'Keberlanjutan'],
+            links: ['Tentang Kami', 'Kontak', 'Keberlanjutan'],
         },
     ];
 

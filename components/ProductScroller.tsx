@@ -42,6 +42,31 @@ const products = [
     },
 ];
 
+const ProductBox = ({ product }: { product: typeof products[0] }) => {
+    return (
+        <div className="min-w-[280px] md:min-w-[320px] bg-white group cursor-pointer border border-transparent hover:border-gray-200 transition-all p-2">
+            <div className="aspect-square relative overflow-hidden bg-[#ebedee]">
+                <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-2 right-2 bg-white p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                </div>
+            </div>
+            <div className="mt-4 space-y-1">
+                <h3 className="text-sm font-semibold uppercase tracking-tight">{product.name}</h3>
+                <p className="text-xs text-gray-500">{product.category}</p>
+                <p className="text-sm font-bold">{product.price}</p>
+            </div>
+        </div>
+    );
+};
+
 const ProductScroller = ({ title }: { title: string }) => {
     return (
         <section className="py-16 overflow-hidden">
@@ -51,26 +76,7 @@ const ProductScroller = ({ title }: { title: string }) => {
                 </h2>
                 <div className="flex space-x-4 overflow-x-auto pb-8 scrollbar-hide">
                     {products.map((product) => (
-                        <div key={product.id} className="min-w-[280px] md:min-w-[320px] bg-white group cursor-pointer border border-transparent hover:border-gray-200 transition-all p-2">
-                            <div className="aspect-square relative overflow-hidden bg-[#ebedee]">
-                                <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    fill
-                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                                />
-                                <div className="absolute top-2 right-2 bg-white p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div className="mt-4 space-y-1">
-                                <h3 className="text-sm font-semibold uppercase tracking-tight">{product.name}</h3>
-                                <p className="text-xs text-gray-500">{product.category}</p>
-                                <p className="text-sm font-bold">{product.price}</p>
-                            </div>
-                        </div>
+                        <ProductBox key={product.id} product={product} />
                     ))}
                 </div>
             </div>

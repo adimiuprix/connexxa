@@ -30,29 +30,67 @@ const ProductBox = ({ product }: { product: typeof products[0] }) => {
     const { contextSafe } = useGSAP({ scope: containerRef });
 
     useGSAP(() => {
-        // Set awal: Gambar kedua berada di bawah (tersembunyi)
+        // Set awal untuk numpuk
         if (product.hoverImage) {
-            gsap.set(".hover-img", { yPercent: 100 });
+            gsap.set(".hover-img", { opacity: 0, zIndex: 2 });
         }
-        gsap.set(".primary-img", { yPercent: 0 });
+        gsap.set(".primary-img", { opacity: 1, zIndex: 1 });
     }, { scope: containerRef });
 
     const handleMouseEnter = contextSafe(() => {
         if (!product.hoverImage) return;
-        // Animasi slide ke atas
-        gsap.to(".primary-img", { yPercent: -100, duration: 0.6, ease: "expo.inOut" });
-        gsap.to(".hover-img", { yPercent: 0, duration: 0.6, ease: "expo.inOut" });
+
+        // Primary image fades and blurs out
+        gsap.to(".primary-img", {
+            duration: 0.5,
+            filter: "blur(10px)",
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        // Hover image fades and un-blurs in
+        gsap.fromTo(".hover-img",
+            {
+                opacity: 0,
+                filter: "blur(10px)"
+            },
+            {
+                opacity: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power2.inOut"
+            }
+        );
     });
 
     const handleMouseLeave = contextSafe(() => {
         if (!product.hoverImage) return;
-        // Animasi slide kembali ke bawah
-        gsap.to(".primary-img", { yPercent: 0, duration: 0.6, ease: "expo.inOut" });
-        gsap.to(".hover-img", { yPercent: 100, duration: 0.6, ease: "expo.inOut" });
+
+        // Hover image fades and blurs out
+        gsap.to(".hover-img", {
+            duration: 0.5,
+            filter: "blur(10px)",
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        // Primary image fades and un-blurs in
+        gsap.fromTo(".primary-img",
+            {
+                opacity: 0,
+                filter: "blur(10px)"
+            },
+            {
+                opacity: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power2.inOut"
+            }
+        );
     });
 
     return (
-        <div 
+        <div
             ref={containerRef}
             className="min-w-[280px] md:min-w-[320px] bg-white group cursor-pointer border border-transparent hover:border-black transition-all p-2"
             onMouseEnter={handleMouseEnter}
@@ -66,7 +104,7 @@ const ProductBox = ({ product }: { product: typeof products[0] }) => {
                     fill
                     className="object-cover primary-img"
                 />
-                
+
                 {/* Hover Image */}
                 {product.hoverImage && (
                     <Image

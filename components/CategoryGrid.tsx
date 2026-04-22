@@ -9,20 +9,20 @@ import { useGSAP } from '@gsap/react';
 const categories = [
     {
         title: 'PRIA',
-        image: '/slides/adidas_men_category.png',
-        hoverImage: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=1000&auto=format&fit=crop',
+        image: '/who-search/pria/pria-1.png',
+        hoverImage: '/who-search/pria/pria-2.png',
         href: '/pria',
     },
     {
         title: 'WANITA',
-        image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop',
-        hoverImage: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1000&auto=format&fit=crop',
+        image: '/who-search/wanita/wanita-1.png',
+        hoverImage: '/who-search/wanita/wanita-2.png',
         href: '/wanita',
     },
     {
         title: 'ANAK',
-        image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=1000&auto=format&fit=crop',
-        hoverImage: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=1000&auto=format&fit=crop',
+        image: '/who-search/anak/anak-1.png',
+        hoverImage: '/who-search/anak/anak-2.png',
         href: '/anak',
     },
 ];

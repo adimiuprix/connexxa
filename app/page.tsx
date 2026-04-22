@@ -9,7 +9,7 @@ export default function Home() {
         <main className="min-h-screen bg-white">
             <Carousel />
             <CategoryGrid />
-            <ProductScroller title="APA YANG SEDANG POPULER?" />
+            <ProductScroller title="PRODUK YANG TERBARU" />
             <ProductScroller title="RILISAN TERBARU" />
             <BrandStory />
             <Newsletter />

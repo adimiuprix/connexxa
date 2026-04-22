@@ -9,6 +9,7 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import Link from 'next/link';
 import Menu from './Menu';
 import NavLink from './NavLink';
+import Image from 'next/image';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,11 +44,7 @@ const Header = () => {
                     </button>
                     <Link href="/">
                         <div className="flex-shrink-0">
-                            <svg viewBox="0 0 64 36" className="w-12 h-8 lg:w-[70px] lg:h-[48px]" fill="currentColor">
-                                <path d="M4 36l10-18h7l-10 18H4z" />
-                                <path d="M18 36L34 8h7L25 36h-7z" />
-                                <path d="M32 36L55 0h7L40 36h-8z" />
-                            </svg>
+                            <Image src="/logo.png" alt="Logo" width={70} height={70} className="object-contain" />
                         </div>
                     </Link>
                 </div>

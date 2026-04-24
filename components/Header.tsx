@@ -8,11 +8,14 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import Link from 'next/link';
 import Menu from './Menu';
+import Modal from './Modal';
+import FormInput from './FormInput';
 import NavLink from './NavLink';
 import Image from 'next/image';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
 
     const handleMenuClick = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -67,7 +70,10 @@ const Header = () => {
                     </div>
 
                     <div className="flex items-center space-x-2 lg:space-x-4">
-                        <button className="p-1 text-black hover:bg-gray-100 rounded-sm transition-colors">
+                        <button 
+                            onClick={() => setIsLoginOpen(true)}
+                            className="p-1 text-black hover:bg-gray-100 rounded-sm transition-colors"
+                        >
                             <PersonOutlinedIcon sx={{ fontSize: 24 }} />
                         </button>
 
@@ -82,6 +88,50 @@ const Header = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Login Modal Integration */}
+            <Modal 
+                isOpen={isLoginOpen} 
+                onClose={() => setIsLoginOpen(false)} 
+                title="MASUK"
+            >
+                <div className="space-y-6">
+                    <p className="text-[13px] text-gray-600 leading-relaxed">
+                        Silakan masukkan detail akun Anda untuk melanjutkan belanja di <span className="font-bold text-black">Connexxa</span>.
+                    </p>
+                    
+                    <div className="space-y-4">
+                        <FormInput 
+                            type="email" 
+                            placeholder="ALAMAT EMAIL *" 
+                            required
+                        />
+                        <FormInput 
+                            type="password" 
+                            placeholder="KATA SANDI *" 
+                            required
+                        />
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-tighter">
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" className="w-4 h-4 accent-black cursor-pointer" />
+                            <span className="group-hover:text-gray-600 transition-colors">Ingat Saya</span>
+                        </label>
+                        <button className="underline decoration-1 underline-offset-4 hover:no-underline transition-all">Lupa sandi Anda?</button>
+                    </div>
+
+                    <button className="w-full bg-black text-white py-5 font-black uppercase tracking-[0.2em] text-[13px] hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        MASUK
+                    </button>
+
+                    <div className="pt-4 border-t border-gray-100 text-center">
+                        <p className="text-[12px] text-gray-500 font-medium">
+                            Belum punya akun? <button className="text-black font-black underline underline-offset-4 hover:no-underline">DAFTAR SEKARANG</button>
+                        </p>
+                    </div>
+                </div>
+            </Modal>
         </header>
     );
 };

@@ -26,7 +26,7 @@ const products = [
 ];
 
 const ProductBox = ({ product }: { product: typeof products[0] }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLAnchorElement>(null);
     const { contextSafe } = useGSAP({ scope: containerRef });
 
     useGSAP(() => {
@@ -90,9 +90,10 @@ const ProductBox = ({ product }: { product: typeof products[0] }) => {
     });
 
     return (
-        <div
+        <Link
+            href={`/product_items/${product.id}`}
             ref={containerRef}
-            className="min-w-[280px] md:min-w-[320px] bg-white group cursor-pointer border border-transparent hover:border-black transition-all p-2"
+            className="min-w-[280px] md:min-w-[320px] bg-white group cursor-pointer border border-transparent hover:border-black transition-all p-2 block"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -121,11 +122,11 @@ const ProductBox = ({ product }: { product: typeof products[0] }) => {
                 </div>
             </div>
             <div className="mt-4 space-y-1">
-                <h3 className="text-sm font-semibold uppercase tracking-tight">{product.name}</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-tight text-black">{product.name}</h3>
                 <p className="text-xs text-gray-500">{product.category}</p>
-                <p className="text-sm font-bold">{product.price}</p>
+                <p className="text-sm font-bold text-black">{product.price}</p>
             </div>
-        </div>
+        </Link>
     );
 };
 

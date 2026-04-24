@@ -61,6 +61,19 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
         return () => window.removeEventListener('keydown', handleEsc);
     }, [isOpen, handleClose]);
 
+    // Handle scroll lock separately and more robustly
+    useEffect(() => {
+        if (isOpen && mounted) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen, mounted]);
+
     // Open animation logic
     useGSAP(() => {
         if (isOpen && mounted) {
@@ -83,14 +96,7 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                 duration: 0.5,
                 ease: "expo.out"
             }, "-=0.2");
-
-            // Lock body scroll
-            document.body.style.overflow = 'hidden';
         }
-
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
     }, [isOpen, mounted]);
 
     if (!mounted || !isOpen) return null;

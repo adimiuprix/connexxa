@@ -12,7 +12,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-    title: "Connexxa | Situs Resmi Adidas Indonesia",
+    title: "Connexxa | Situs Resmi Connexxa Indonesia",
     description: "Belanja koleksi terbaru sepatu, pakaian, dan aksesori olahraga di Connexxa. Gratis ongkir untuk pembelian tertentu.",
 };
 

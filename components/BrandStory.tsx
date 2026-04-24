@@ -14,7 +14,7 @@ const BrandStory = () => {
                     <div className="hidden lg:block relative h-full w-full">
                         <img
                             src="https://images.unsplash.com/photo-1518002171953-a080ee817e1f?q=80&w=800&auto=format&fit=crop"
-                            alt="Adidas Fabric Detail"
+                            alt="Fabric Detail"
                             className="w-full h-full object-cover"
                         />
                     </div>

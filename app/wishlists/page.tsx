@@ -5,13 +5,13 @@ import ButtonDark from '@/components/ButtonDark';
 import CloseIcon from '@mui/icons-material/Close';
 import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
 
-const dummyWishlists = [
+const Wishlists = [
     {
         id: 1,
         name: "SEPATU LOAFER HANDBALL SPEZIAL",
         price: "Rp.2.200.000,00",
         color: "Aurora Coffee / Aurora Coffee / Gum",
-        image: "https://placehold.co/400x400/f5f5f5/f5f5f5", 
+        image: "https://placehold.co/400x400/f5f5f5/f5f5f5",
     },
     {
         id: 2,
@@ -30,7 +30,7 @@ const WishlistsPage = () => {
             </h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
-                {dummyWishlists.map((item) => (
+                {Wishlists.map((item) => (
                     <div key={item.id} className="flex flex-col group">
                         {/* Image Container */}
                         <div className="relative aspect-square bg-[#f5f5f5] mb-4">
@@ -51,9 +51,9 @@ const WishlistsPage = () => {
 
                         {/* Add to Cart Button */}
                         <div className="mt-auto">
-                            <ButtonDark 
-                                text="Tambahkan Ke Tas" 
-                                fullWidth={true} 
+                            <ButtonDark
+                                text="Tambahkan Ke Tas"
+                                fullWidth={true}
                                 icon={<LocalMallOutlinedIcon sx={{ fontSize: 20 }} className="ml-3" />}
                                 className="w-full"
                             />

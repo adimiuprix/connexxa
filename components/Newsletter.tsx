@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ButtonDark from './ButtonDark';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const Newsletter = () => {
     return (
@@ -10,7 +11,7 @@ const Newsletter = () => {
                 GABUNG ADICLUB & DAPATKAN DISKON 15%
             </h2>
             <div className="flex-shrink-0">
-                <ButtonDark text="DAFTAR SEKARANG" />
+                <ButtonDark text="DAFTAR SEKARANG" icon={<ArrowForwardIcon className="ml-3 transition-transform duration-200 group-hover:translate-x-1" sx={{ fontSize: 20 }} />} />
             </div>
         </section>
     );

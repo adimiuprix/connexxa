@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import ButtonDark from './ButtonDark';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -99,7 +100,7 @@ export default function Carousel() {
                                     </p>
                                 </div>
                                 <div className="flex space-x-4">
-                                    <ButtonDark text={image.cta} />
+                                    <ButtonDark text={image.cta} icon={<ArrowForwardIcon className="ml-3 transition-transform duration-200 group-hover:translate-x-1" sx={{ fontSize: 20 }} />} />
                                 </div>
                             </div>
                         </div>

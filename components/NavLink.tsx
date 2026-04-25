@@ -2,7 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { menuItems } from '@/libs/MenuItem';
+
+const menuItems = [
+    { label: 'PRIA', href: '/pria' },
+    { label: 'WANITA', href: '/wanita' },
+    { label: 'ANAK', href: '/anak' },
+    { label: 'SALE', href: '/sale' },
+    { href: "#", label: "COMMING SOON" }
+];
 
 const NavLink = () => {
     const pathname = usePathname();

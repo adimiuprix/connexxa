@@ -6,26 +6,7 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
-const products = [
-    {
-        id: 1,
-        name: 'Elegant Dress 1',
-        category: 'Women',
-        price: 'Rp 2.200.000',
-        image: '/product-images/dress1.1.jpg',
-        hoverImage: '/product-images/dress1.2.jpg',
-    },
-    {
-        id: 2,
-        name: 'Casual Dress 1',
-        category: 'Women',
-        price: 'Rp 4.000.000',
-        image: '/product-images/dress2.1.jpg',
-        hoverImage: '/product-images/dress2.2.jpg',
-    },
-];
-
-const ProductBox = ({ product }: { product: typeof products[0] }) => {
+const ProductBox = ({ product }: { product: any }) => {
     const containerRef = useRef<HTMLAnchorElement>(null);
     const { contextSafe } = useGSAP({ scope: containerRef });
 
@@ -91,7 +72,7 @@ const ProductBox = ({ product }: { product: typeof products[0] }) => {
 
     return (
         <Link
-            href={`/product_items/${product.id}`}
+            href={`/product_items/${product.name}`}
             ref={containerRef}
             className="min-w-[280px] md:min-w-[320px] bg-white group cursor-pointer border border-transparent hover:border-black transition-all p-2 block"
             onMouseEnter={handleMouseEnter}
@@ -129,22 +110,4 @@ const ProductBox = ({ product }: { product: typeof products[0] }) => {
         </Link>
     );
 };
-
-const ProductScroller = ({ title }: { title: string }) => {
-    return (
-        <section className="py-16 overflow-hidden">
-            <div className="max-w-[1920px] mx-auto px-4 lg:px-20">
-                <h2 className="text-3xl md:text-4xl font-black italic mb-8 tracking-tighter uppercase text-black">
-                    {title}
-                </h2>
-                <div className="flex space-x-4 overflow-x-auto pb-8 scrollbar-hide">
-                    {products.map((product) => (
-                        <ProductBox key={product.id} product={product} />
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-};
-
-export default ProductScroller;
+export default ProductBox;

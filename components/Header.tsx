@@ -26,18 +26,19 @@ const Header = () => {
     const handleSwitchMode = contextSafe((newMode: 'login' | 'register') => {
         if (!containerRef.current) return;
         const tl = gsap.timeline();
-        
+
         tl.to(containerRef.current, { duration: 0.04, skewX: 30, x: -10, opacity: 0.8, ease: "steps(1)" })
-          .to(containerRef.current, { duration: 0.04, skewX: -30, x: 10, opacity: 0.6 })
-          .to(containerRef.current, { duration: 0.04, skewX: 15, x: -5, opacity: 0.4 })
-          .to(containerRef.current, { duration: 0.04, skewX: 0, x: 0, opacity: 0,
-              onComplete: () => {
-                  setAuthMode(newMode);
-              }
-          })
-          .to(containerRef.current, { duration: 0.04, skewX: -15, x: 5, opacity: 0.5 })
-          .to(containerRef.current, { duration: 0.04, skewX: 30, x: -10, opacity: 0.8 })
-          .to(containerRef.current, { duration: 0.04, skewX: 0, x: 0, opacity: 1, ease: "steps(1)" });
+            .to(containerRef.current, { duration: 0.04, skewX: -30, x: 10, opacity: 0.6 })
+            .to(containerRef.current, { duration: 0.04, skewX: 15, x: -5, opacity: 0.4 })
+            .to(containerRef.current, {
+                duration: 0.04, skewX: 0, x: 0, opacity: 0,
+                onComplete: () => {
+                    setAuthMode(newMode);
+                }
+            })
+            .to(containerRef.current, { duration: 0.04, skewX: -15, x: 5, opacity: 0.5 })
+            .to(containerRef.current, { duration: 0.04, skewX: 30, x: -10, opacity: 0.8 })
+            .to(containerRef.current, { duration: 0.04, skewX: 0, x: 0, opacity: 1, ease: "steps(1)" });
     });
 
     const handleMenuClick = () => {
@@ -192,14 +193,6 @@ const Header = () => {
                                     placeholder="ULANGI KATA SANDI *"
                                     required
                                 />
-                            </div>
-
-                            <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-tighter">
-                                <label className="flex items-center gap-2 cursor-pointer group">
-                                    <input type="checkbox" className="w-4 h-4 accent-black cursor-pointer" />
-                                    <span className="group-hover:text-gray-600 transition-colors">Ingat Saya</span>
-                                </label>
-                                <button onClick={() => handleSwitchMode('login')} className="underline decoration-1 underline-offset-4 hover:no-underline transition-all">Lupa sandi Anda?</button>
                             </div>
 
                             <button className="w-full bg-black text-white py-5 font-black uppercase tracking-[0.2em] text-[13px] hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">

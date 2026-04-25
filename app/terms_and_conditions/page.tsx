@@ -12,7 +12,7 @@ const page = () => {
                         <div>
                             <h2 className="text-xl font-semibold mb-2">1. Introduction</h2>
                             <p className="text-gray-700">
-                                Welcome to adidas Indonesia (Connexxa). These Terms and Conditions govern your access and use of our website, mobile application, and online services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.
+                                Welcome to connexxa Indonesia (Connexxa). These Terms and Conditions govern your access and use of our website, mobile application, and online services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.
                             </p>
                         </div>
 

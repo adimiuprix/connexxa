@@ -1,21 +1,44 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
 import Menu from './Menu';
 import Modal from './Modal';
 import FormInput from './FormInput';
 import NavLink from './NavLink';
 import Image from 'next/image';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { contextSafe } = useGSAP({ scope: containerRef });
+
+    const handleSwitchMode = contextSafe((newMode: 'login' | 'register') => {
+        if (!containerRef.current) return;
+        const tl = gsap.timeline();
+        
+        tl.to(containerRef.current, { duration: 0.04, skewX: 30, x: -10, opacity: 0.8, ease: "steps(1)" })
+          .to(containerRef.current, { duration: 0.04, skewX: -30, x: 10, opacity: 0.6 })
+          .to(containerRef.current, { duration: 0.04, skewX: 15, x: -5, opacity: 0.4 })
+          .to(containerRef.current, { duration: 0.04, skewX: 0, x: 0, opacity: 0,
+              onComplete: () => {
+                  setAuthMode(newMode);
+              }
+          })
+          .to(containerRef.current, { duration: 0.04, skewX: -15, x: 5, opacity: 0.5 })
+          .to(containerRef.current, { duration: 0.04, skewX: 30, x: -10, opacity: 0.8 })
+          .to(containerRef.current, { duration: 0.04, skewX: 0, x: 0, opacity: 1, ease: "steps(1)" });
+    });
 
     const handleMenuClick = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -70,8 +93,11 @@ const Header = () => {
                     </div>
 
                     <div className="flex items-center space-x-2 lg:space-x-4">
-                        <button 
-                            onClick={() => setIsLoginOpen(true)}
+                        <button
+                            onClick={() => {
+                                setAuthMode('login');
+                                setIsAuthOpen(true);
+                            }}
                             className="p-1 text-black hover:bg-gray-100 rounded-sm transition-colors"
                         >
                             <PersonOutlinedIcon sx={{ fontSize: 24 }} />
@@ -89,47 +115,115 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* Login Modal Integration */}
-            <Modal 
-                isOpen={isLoginOpen} 
-                onClose={() => setIsLoginOpen(false)} 
-                title="MASUK"
+            {/* Authentication Modal Integration */}
+            <Modal
+                isOpen={isAuthOpen}
+                onClose={() => setIsAuthOpen(false)}
+                title={authMode === 'login' ? "MASUK" : "PENDAFTARAN"}
             >
-                <div className="space-y-6">
-                    <p className="text-[13px] text-gray-600 leading-relaxed">
-                        Silakan masukkan detail akun Anda untuk melanjutkan belanja di <span className="font-bold text-black">Connexxa</span>.
-                    </p>
-                    
-                    <div className="space-y-4">
-                        <FormInput 
-                            type="email" 
-                            placeholder="ALAMAT EMAIL *" 
-                            required
-                        />
-                        <FormInput 
-                            type="password" 
-                            placeholder="KATA SANDI *" 
-                            required
-                        />
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-tighter">
-                        <label className="flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" className="w-4 h-4 accent-black cursor-pointer" />
-                            <span className="group-hover:text-gray-600 transition-colors">Ingat Saya</span>
-                        </label>
-                        <button className="underline decoration-1 underline-offset-4 hover:no-underline transition-all">Lupa sandi Anda?</button>
-                    </div>
+                <div ref={containerRef}>
+                    {authMode === 'login' ? (
+                        <div className="space-y-6">
+                            <p className="text-[13px] text-gray-600 leading-relaxed">
+                                Silakan masukkan detail akun Anda untuk melanjutkan belanja di <span className="font-bold text-black">Connexxa</span>.
+                            </p>
 
-                    <button className="w-full bg-black text-white py-5 font-black uppercase tracking-[0.2em] text-[13px] hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
-                        MASUK
-                    </button>
+                            <div className="space-y-4">
+                                <FormInput
+                                    type="email"
+                                    placeholder="ALAMAT EMAIL *"
+                                    required
+                                />
+                                <FormInput
+                                    type="password"
+                                    placeholder="KATA SANDI *"
+                                    required
+                                />
+                            </div>
 
-                    <div className="pt-4 border-t border-gray-100 text-center">
-                        <p className="text-[12px] text-gray-500 font-medium">
-                            Belum punya akun? <button className="text-black font-black underline underline-offset-4 hover:no-underline">DAFTAR SEKARANG</button>
-                        </p>
-                    </div>
+                            <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-tighter">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input type="checkbox" className="w-4 h-4 accent-black cursor-pointer" />
+                                    <span className="group-hover:text-gray-600 transition-colors">Ingat Saya</span>
+                                </label>
+                                <button className="underline decoration-1 underline-offset-4 hover:no-underline transition-all">Lupa sandi Anda?</button>
+                            </div>
+
+                            <button className="w-full bg-black text-white py-5 font-black uppercase tracking-[0.2em] text-[13px] hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
+                                MASUK
+                            </button>
+
+                            <div className="relative flex items-center py-1">
+                                <div className="flex-grow border-t border-gray-200"></div>
+                                <span className="flex-shrink-0 mx-4 text-gray-400 text-[11px] font-bold tracking-widest uppercase">Atau</span>
+                                <div className="flex-grow border-t border-gray-200"></div>
+                            </div>
+
+                            <button className="w-full bg-white text-black py-4 font-black uppercase tracking-[0.1em] text-[13px] border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm">
+                                <GoogleIcon sx={{ fontSize: 20 }} />
+                                MASUK DENGAN GOOGLE
+                            </button>
+
+                            <div className="pt-4 border-t border-gray-100 text-center">
+                                <p className="text-[12px] text-gray-500 font-medium">
+                                    Belum punya akun? <button onClick={() => handleSwitchMode('register')} className="text-black font-black underline underline-offset-4 hover:no-underline">DAFTAR SEKARANG</button>
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            <p className="text-[13px] text-gray-600 leading-relaxed">
+                                Silakan masukkan detail akun Anda untuk melanjutkan belanja di <span className="font-bold text-black">Connexxa</span>.
+                            </p>
+
+                            <div className="space-y-4">
+                                <FormInput
+                                    type="email"
+                                    placeholder="ALAMAT EMAIL *"
+                                    required
+                                />
+                                <FormInput
+                                    type="password"
+                                    placeholder="KATA SANDI *"
+                                    required
+                                />
+                                <FormInput
+                                    type="password"
+                                    placeholder="ULANGI KATA SANDI *"
+                                    required
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-tighter">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input type="checkbox" className="w-4 h-4 accent-black cursor-pointer" />
+                                    <span className="group-hover:text-gray-600 transition-colors">Ingat Saya</span>
+                                </label>
+                                <button onClick={() => handleSwitchMode('login')} className="underline decoration-1 underline-offset-4 hover:no-underline transition-all">Lupa sandi Anda?</button>
+                            </div>
+
+                            <button className="w-full bg-black text-white py-5 font-black uppercase tracking-[0.2em] text-[13px] hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl">
+                                DAFTAR
+                            </button>
+
+                            <div className="relative flex items-center py-1">
+                                <div className="flex-grow border-t border-gray-200"></div>
+                                <span className="flex-shrink-0 mx-4 text-gray-400 text-[11px] font-bold tracking-widest uppercase">Atau</span>
+                                <div className="flex-grow border-t border-gray-200"></div>
+                            </div>
+
+                            <button className="w-full bg-white text-black py-4 font-black uppercase tracking-[0.1em] text-[13px] border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm">
+                                <GoogleIcon sx={{ fontSize: 20 }} />
+                                DAFTAR DENGAN GOOGLE
+                            </button>
+
+                            <div className="pt-4 border-t border-gray-100 text-center">
+                                <p className="text-[12px] text-gray-500 font-medium">
+                                    Sudah punya akun? <button onClick={() => handleSwitchMode('login')} className="text-black font-black underline underline-offset-4 hover:no-underline">MASUK SEKARANG</button>
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Modal>
         </header>

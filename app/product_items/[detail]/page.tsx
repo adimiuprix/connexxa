@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import RadioButton from '@/components/RadioButton';
@@ -34,9 +34,65 @@ const sizeOptions = [
 const Page = () => {
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState('');
+    const [selectedColor, setSelectedColor] = useState('Black');
     const [showDescription, setShowDescription] = useState(true);
     const [showDetails, setShowDetails] = useState(false);
     const [showDelivery, setShowDelivery] = useState(false);
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [cartMessage, setCartMessage] = useState('');
+
+    // Generate atau ambil sessionId dari localStorage
+    const getSessionId = useCallback(() => {
+        if (typeof window === 'undefined') return '';
+        let sessionId = localStorage.getItem('cart_session_id');
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            localStorage.setItem('cart_session_id', sessionId);
+        }
+        return sessionId;
+    }, []);
+
+    // Handler: Tambahkan ke Cart
+    const handleAddToCart = async () => {
+        if (!selectedSize) {
+            setCartMessage('⚠️ Silakan pilih ukuran terlebih dahulu');
+            setTimeout(() => setCartMessage(''), 3000);
+            return;
+        }
+
+        setIsAddingToCart(true);
+        setCartMessage('');
+
+        try {
+            const response = await fetch('/api/cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: getSessionId(),
+                    productId: 'elegant-dress-1',
+                    title: 'ELEGANT DRESS COLLECTION',
+                    size: selectedSize,
+                    color: selectedColor,
+                    price: 2200000,
+                    quantity: 1,
+                    image: productImages[0],
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setCartMessage(`✅ ${data.message} (${data.totalItems} item di tas)`);
+            } else {
+                setCartMessage(`❌ ${data.error}`);
+            }
+        } catch (error) {
+            setCartMessage('❌ Gagal menambahkan ke tas. Coba lagi.');
+        } finally {
+            setIsAddingToCart(false);
+            setTimeout(() => setCartMessage(''), 4000);
+        }
+    };
 
     return (
         <div className="pt-6 pb-20">
@@ -131,11 +187,11 @@ const Page = () => {
 
                     {/* Color */}
                     <div className="mt-6">
-                        <p className="text-xs font-semibold text-black uppercase tracking-wider mb-2">Warna: <span className="font-normal text-gray-600">Black</span></p>
+                        <p className="text-xs font-semibold text-black uppercase tracking-wider mb-2">Warna: <span className="font-normal text-gray-600">{selectedColor}</span></p>
                         <div className="flex gap-2">
-                            <button className="w-8 h-8 bg-black border-2 border-black" title="Black" />
-                            <button className="w-8 h-8 bg-white border border-gray-300 hover:border-black transition-colors" title="White" />
-                            <button className="w-8 h-8 bg-[#8B4513] border border-gray-300 hover:border-black transition-colors" title="Brown" />
+                            <button onClick={() => setSelectedColor('Black')} className={`w-8 h-8 bg-black border-2 transition-colors ${selectedColor === 'Black' ? 'border-black' : 'border-gray-300 hover:border-black'}`} title="Black" />
+                            <button onClick={() => setSelectedColor('White')} className={`w-8 h-8 bg-white border-2 transition-colors ${selectedColor === 'White' ? 'border-black' : 'border-gray-300 hover:border-black'}`} title="White" />
+                            <button onClick={() => setSelectedColor('Brown')} className={`w-8 h-8 bg-[#8B4513] border-2 transition-colors ${selectedColor === 'Brown' ? 'border-black' : 'border-gray-300 hover:border-black'}`} title="Brown" />
                         </div>
                     </div>
 
@@ -162,10 +218,30 @@ const Page = () => {
 
                     {/* Add to Cart Button */}
                     <div className="mt-6 space-y-3">
-                        <button className="group w-full h-[52px] bg-black text-white font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 hover:bg-gray-800 transition-colors duration-200">
-                            <span>Tambahkan ke Tas</span>
-                            <ArrowForwardIcon className="transition-transform duration-200 group-hover:translate-x-1" sx={{ fontSize: 18 }} />
+                        <button
+                            onClick={handleAddToCart}
+                            disabled={isAddingToCart}
+                            className={`group w-full h-[52px] font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 transition-colors duration-200 ${
+                                isAddingToCart
+                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                    : 'bg-black text-white hover:bg-gray-800'
+                            }`}
+                        >
+                            <span>{isAddingToCart ? 'Menambahkan...' : 'Tambahkan ke Tas'}</span>
+                            {!isAddingToCart && (
+                                <ArrowForwardIcon className="transition-transform duration-200 group-hover:translate-x-1" sx={{ fontSize: 18 }} />
+                            )}
                         </button>
+
+                        {cartMessage && (
+                            <p className={`text-[12px] font-medium text-center py-2 ${
+                                cartMessage.startsWith('✅') ? 'text-green-700 bg-green-50' :
+                                cartMessage.startsWith('⚠️') ? 'text-yellow-700 bg-yellow-50' :
+                                'text-red-700 bg-red-50'
+                            }`}>
+                                {cartMessage}
+                            </p>
+                        )}
 
                         <button className="w-full h-[52px] bg-white text-black border border-black font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 hover:bg-black hover:text-white transition-all duration-200">
                             <FavoriteBorderIcon sx={{ fontSize: 18 }} />

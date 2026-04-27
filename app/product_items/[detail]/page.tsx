@@ -118,8 +118,25 @@ const Page = () => {
     const sizeOptions = product.sizes.map((ps: any) => ({
         label: ps.size.value,
         value: ps.size.value,
-        disabled: ps.available !== 'TRUE'
+        disabled: ps.available !== 'true'
     }));
+
+    const reviewCount = product.tot_review || 0;
+    const averageRating = reviewCount > 0 
+        ? product.reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / reviewCount 
+        : 0;
+
+    const renderStars = (rating: number) => {
+        return (
+            <div className="flex items-center text-black">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    star <= Math.round(rating) 
+                        ? <StarIcon key={star} sx={{ fontSize: 16 }} /> 
+                        : <StarBorderIcon key={star} sx={{ fontSize: 16 }} />
+                ))}
+            </div>
+        );
+    };
 
     return (
         <div className="pt-6 pb-20">
@@ -204,14 +221,8 @@ const Page = () => {
 
                     {/* Ratings */}
                     <div className="mt-3 flex items-center gap-2">
-                        <div className="flex items-center text-black">
-                            <StarIcon sx={{ fontSize: 16 }} />
-                            <StarIcon sx={{ fontSize: 16 }} />
-                            <StarIcon sx={{ fontSize: 16 }} />
-                            <StarIcon sx={{ fontSize: 16 }} />
-                            <StarBorderIcon sx={{ fontSize: 16 }} />
-                        </div>
-                        <span className="text-xs font-medium text-gray-500">(24 Ulasan)</span>
+                        {renderStars(averageRating)}
+                        <span className="text-xs font-medium text-gray-500">({reviewCount} Ulasan)</span>
                     </div>
 
                     {/* Color */}

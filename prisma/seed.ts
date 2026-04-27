@@ -21,7 +21,25 @@ const getPublicUrl = (path: string) => {
 async function main() {
     console.log("Start seeding...");
 
-    // 1. Create Sizes
+    // 1. Create Users
+    const usersData = [
+        { email: "john@example.com", name: "John Doe" },
+        { email: "jane@example.com", name: "Jane Smith" },
+        { email: "budi@example.com", name: "Budi Santoso" },
+    ];
+
+    const users = [];
+    for (const userData of usersData) {
+        const user = await prisma.user.upsert({
+            where: { email: userData.email },
+            update: userData,
+            create: userData,
+        });
+        users.push(user);
+        console.log(`Created user: ${user.email}`);
+    }
+
+    // 2. Create Sizes
     const sizesData = [
         { name: "Extra Small", value: "XS" },
         { name: "Small", value: "S" },
@@ -42,7 +60,7 @@ async function main() {
         console.log(`Created size: ${createdSize.value}`);
     }
 
-    // 2. Create Products
+    // 3. Create Products
     const productsData = [
         {
             sku: "PROD-001",
@@ -113,7 +131,7 @@ async function main() {
             create: productData,
         });
 
-        // 3. Associate with Sizes
+        // 4. Associate with Sizes
         for (const size of sizes) {
             await prisma.productSize.upsert({
                 where: {
@@ -123,16 +141,34 @@ async function main() {
                     },
                 },
                 update: {
-                    available: "TRUE",
+                    available: "true",
                 },
                 create: {
                     productId: product.id,
                     sizeId: size.id,
-                    available: "TRUE",
+                    available: "true",
                 },
             });
         }
-        console.log(`Upserted product: ${product.title} with availability`);
+
+        // 5. Create Reviews
+        const reviewsData = [
+            { rating: 5, comment: "Sangat bagus! Bahannya adem.", userId: users[0].id },
+            { rating: 4, comment: "Kualitas oke, tapi pengiriman agak lama.", userId: users[1].id },
+        ];
+
+        for (const review of reviewsData) {
+            await prisma.review.create({
+                data: {
+                    rating: review.rating,
+                    comment: review.comment,
+                    productId: product.id,
+                    userId: review.userId,
+                }
+            });
+        }
+
+        console.log(`Upserted product: ${product.title} with sizes and reviews`);
     }
 
     console.log("Seeding finished.");

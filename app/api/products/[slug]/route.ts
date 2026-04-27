@@ -11,6 +11,13 @@ export async function GET(
       where: {
         slug: slug,
       },
+      include: {
+        sizes: {
+          include: {
+            size: true,
+          },
+        },
+      },
     });
 
     if (!product) {
@@ -18,10 +25,10 @@ export async function GET(
     }
 
     return NextResponse.json(product);
-  } catch (error) {
-    console.error("Error fetching product:", error);
+  } catch (error: any) {
+    console.error("Detailed error fetching product:", error);
     return NextResponse.json(
-      { error: "Failed to fetch product" },
+      { error: "Failed to fetch product", details: error.message },
       { status: 500 }
     );
   }

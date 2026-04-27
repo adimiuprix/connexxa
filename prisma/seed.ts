@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "../generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import "dotenv/config";
@@ -10,9 +10,9 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 // Supabase Storage Configuration
-const SUPABASE_PROJECT_ID = process.env.SUPABASE_PROJECT_ID;
+const SUPABASE_PROJECT_ID = process.env.SUPABASE_PROJECT_ID || "frumqoxwisgigytdlvlj";
 const SUPABASE_URL = `https://${SUPABASE_PROJECT_ID}.supabase.co`;
-const BUCKET_NAME = process.env.BUCKET_NAME;
+const BUCKET_NAME = process.env.BUCKET_NAME || "decrodet";
 
 const getPublicUrl = (path: string) => {
     return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/products/${path}`;
@@ -21,7 +21,29 @@ const getPublicUrl = (path: string) => {
 async function main() {
     console.log("Start seeding...");
 
-    const products = [
+    // 1. Create Sizes
+    const sizesData = [
+        { name: "Extra Small", value: "XS" },
+        { name: "Small", value: "S" },
+        { name: "Medium", value: "M" },
+        { name: "Large", value: "L" },
+        { name: "Extra Large", value: "XL" },
+        { name: "Double Extra Large", value: "2XL" },
+    ];
+
+    const sizes = [];
+    for (const size of sizesData) {
+        const createdSize = await prisma.size.upsert({
+            where: { value: size.value },
+            update: size,
+            create: size,
+        });
+        sizes.push(createdSize);
+        console.log(`Created size: ${createdSize.value}`);
+    }
+
+    // 2. Create Products
+    const productsData = [
         {
             sku: "PROD-001",
             title: "Premium Cotton T-Shirt",
@@ -84,13 +106,33 @@ async function main() {
         },
     ];
 
-    for (const product of products) {
-        const upsertedProduct = await prisma.product.upsert({
-            where: { sku: product.sku },
-            update: product,
-            create: product,
+    for (const productData of productsData) {
+        const product = await prisma.product.upsert({
+            where: { sku: productData.sku },
+            update: productData,
+            create: productData,
         });
-        console.log(`Upserted product: ${upsertedProduct.title}`);
+
+        // 3. Associate with Sizes
+        for (const size of sizes) {
+            await prisma.productSize.upsert({
+                where: {
+                    productId_sizeId: {
+                        productId: product.id,
+                        sizeId: size.id,
+                    },
+                },
+                update: {
+                    available: "TRUE",
+                },
+                create: {
+                    productId: product.id,
+                    sizeId: size.id,
+                    available: "TRUE",
+                },
+            });
+        }
+        console.log(`Upserted product: ${product.title} with availability`);
     }
 
     console.log("Seeding finished.");

@@ -16,15 +16,6 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-const sizeOptions = [
-    { label: 'XS', value: 'XS' },
-    { label: 'S', value: 'S' },
-    { label: 'M', value: 'M' },
-    { label: 'L', value: 'L' },
-    { label: 'XL', value: 'XL', disabled: false },
-    { label: '2XL', value: '2XL', disabled: true },
-];
-
 const Page = () => {
     const params = useParams();
     const detail = params.detail as string;
@@ -123,6 +114,12 @@ const Page = () => {
     }
 
     const productImages = product.images.length > 0 ? product.images : ['/placeholder.jpg'];
+
+    const sizeOptions = product.sizes.map((ps: any) => ({
+        label: ps.size.value,
+        value: ps.size.value,
+        disabled: ps.available !== 'TRUE'
+    }));
 
     return (
         <div className="pt-6 pb-20">

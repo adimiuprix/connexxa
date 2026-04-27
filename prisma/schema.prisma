@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -13,7 +13,7 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
@@ -22,7 +22,7 @@ model User {
 }
 
 model Product {
-  id          String     @id @default(uuid())
+  id          Int        @id @default(autoincrement())
   sku         String     @unique
   title       String
   slug        String     @unique
@@ -30,14 +30,38 @@ model Product {
   price       Int        @default(0) // Harga dalam Rupiah
   stock       Int        @default(0)
   images      String[]   @default([])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  sizes       ProductSize[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Size {
+  id       Int           @id @default(autoincrement())
+  name     String        @unique // e.g. "Medium"
+  value    String        @unique // e.g. "M"
+  products ProductSize[]
+}
+
+model ProductSize {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sizeId    Int
+  size      Size    @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+  available Availability @default(TRUE)
+
+  @@unique([productId, sizeId])
+}
+
+enum Availability {
+  TRUE
+  FALSE
 }
 
 model Cart {
-  id         String     @id @default(uuid())
+  id         Int        @id @default(autoincrement())
   sessionId  String     @unique
-  userId     String?
+  userId     Int?
   user       User?      @relation(fields: [userId], references: [id])
   currency   String     @default("IDR")
   items      CartItem[]
@@ -46,10 +70,10 @@ model Cart {
 }
 
 model CartItem {
-  id         String   @id @default(uuid())
-  cartId     String
+  id         Int      @id @default(autoincrement())
+  cartId     Int
   cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  productId  String                // ID produk (misal: "dress-1")
+  productId  Int                   // ID produk
   title      String                // Nama produk
   size       String                // Ukuran yang dipilih
   color      String                // Warna yang dipilih

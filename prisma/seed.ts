@@ -2,6 +2,7 @@ import { PrismaClient } from "../generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import "dotenv/config";
+import crypto from "crypto";
 
 // Setup adapter for Prisma 7
 const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
@@ -23,20 +24,38 @@ async function main() {
 
     // 1. Create Users
     const usersData = [
-        { email: "john@example.com", name: "John Doe" },
-        { email: "jane@example.com", name: "Jane Smith" },
-        { email: "budi@example.com", name: "Budi Santoso" },
+        {
+            email: "john@example.com",
+            name: "John Doe",
+            uuid: crypto.randomUUID(),
+            phone: "081234567890",
+            image: "profile.webp",
+        },
+        {
+            email: "jane@example.com",
+            name: "Jane Smith",
+            uuid: crypto.randomUUID(),
+            phone: "081234567891",
+            image: "profile.webp",
+        },
+        {
+            email: "budi@example.com",
+            name: "Budi Santoso",
+            uuid: crypto.randomUUID(),
+            phone: "081234567892",
+            image: "profile.webp",
+        },
     ];
 
     const users = [];
     for (const userData of usersData) {
         const user = await prisma.user.upsert({
-            where: { email: userData.email },
+            where: { email: userData.email || "" },
             update: userData,
             create: userData,
         });
         users.push(user);
-        console.log(`Created user: ${user.email}`);
+        console.log(`Created user: ${user.email} (uuid: ${user.uuid})`);
     }
 
     // 2. Create Sizes

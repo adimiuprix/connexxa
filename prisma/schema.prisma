@@ -25,6 +25,7 @@ model Product {
   id          String     @id @default(uuid())
   sku         String     @unique
   title       String
+  slug        String     @unique
   description String?
   price       Int        @default(0) // Harga dalam Rupiah
   stock       Int        @default(0)
@@ -35,8 +36,8 @@ model Product {
 
 model Cart {
   id         String     @id @default(uuid())
-  sessionId  String     @unique  // ID sesi untuk guest user (disimpan di localStorage)
-  userId     String?              // Opsional, jika user sudah login
+  sessionId  String     @unique
+  userId     String?
   user       User?      @relation(fields: [userId], references: [id])
   currency   String     @default("IDR")
   items      CartItem[]

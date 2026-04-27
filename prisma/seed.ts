@@ -9,25 +9,23 @@ const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-// Supabase Storage Configuration (Ganti dengan URL proyek Anda)
-const SUPABASE_PROJECT_ID = "frumqoxwisgigytdlvlj"; // Didapat dari DATABASE_URL Anda
+// Supabase Storage Configuration
+const SUPABASE_PROJECT_ID = "frumqoxwisgigytdlvlj";
 const SUPABASE_URL = `https://${SUPABASE_PROJECT_ID}.supabase.co`;
 const BUCKET_NAME = "products";
 
-/**
- * Helper untuk mendapatkan URL publik dari Supabase Storage
- */
 const getPublicUrl = (path: string) => {
   return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${path}`;
 };
 
 async function main() {
-  console.log("Start seeding with Supabase Storage URLs...");
+  console.log("Start seeding...");
 
   const products = [
     {
       sku: "PROD-001",
       title: "Premium Cotton T-Shirt",
+      slug: "premium-cotton-t-shirt",
       description: "A comfortable and stylish premium cotton t-shirt, perfect for everyday wear.",
       price: 150000,
       stock: 50,
@@ -39,6 +37,7 @@ async function main() {
     {
       sku: "PROD-002",
       title: "Slim Fit Denim Jeans",
+      slug: "slim-fit-denim-jeans",
       description: "Classic slim fit denim jeans with a modern touch. Durable and versatile.",
       price: 450000,
       stock: 30,
@@ -50,6 +49,7 @@ async function main() {
     {
       sku: "PROD-003",
       title: "Minimalist Leather Backpack",
+      slug: "minimalist-leather-backpack",
       description: "Sleek and functional leather backpack for the modern professional.",
       price: 850000,
       stock: 15,
@@ -61,6 +61,7 @@ async function main() {
     {
       sku: "PROD-004",
       title: "Wireless Noise-Canceling Headphones",
+      slug: "wireless-noise-canceling-headphones",
       description: "Experience pure sound with our latest noise-canceling technology.",
       price: 2500000,
       stock: 20,
@@ -72,6 +73,7 @@ async function main() {
     {
       sku: "PROD-005",
       title: "Smart Sports Watch",
+      slug: "smart-sports-watch",
       description: "Track your fitness and stay connected with this advanced smart watch.",
       price: 1200000,
       stock: 25,

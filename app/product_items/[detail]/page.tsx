@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import RadioButton from '@/components/RadioButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ShareIcon from '@mui/icons-material/Share';
@@ -15,13 +16,6 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-const productImages = [
-    '/product-images/dress1.1.jpg',
-    '/product-images/dress1.2.jpg',
-    '/product-images/dress2.1.jpg',
-    '/product-images/dress2.2.jpg',
-];
-
 const sizeOptions = [
     { label: 'XS', value: 'XS' },
     { label: 'S', value: 'S' },
@@ -32,6 +26,11 @@ const sizeOptions = [
 ];
 
 const Page = () => {
+    const params = useParams();
+    const detail = params.detail as string;
+
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('Black');
@@ -40,6 +39,26 @@ const Page = () => {
     const [showDelivery, setShowDelivery] = useState(false);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [cartMessage, setCartMessage] = useState('');
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const response = await fetch(`/api/products/${detail}`);
+                const data = await response.json();
+                if (response.ok) {
+                    setProduct(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch product:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (detail) {
+            fetchProduct();
+        }
+    }, [detail]);
 
     // Generate atau ambil sessionId dari localStorage
     const getSessionId = useCallback(() => {
@@ -54,6 +73,7 @@ const Page = () => {
 
     // Handler: Tambahkan ke Cart
     const handleAddToCart = async () => {
+        if (!product) return;
         if (!selectedSize) {
             setCartMessage('⚠️ Silakan pilih ukuran terlebih dahulu');
             setTimeout(() => setCartMessage(''), 3000);
@@ -69,13 +89,13 @@ const Page = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     sessionId: getSessionId(),
-                    productId: 'elegant-dress-1',
-                    title: 'ELEGANT DRESS COLLECTION',
+                    productId: product.id,
+                    title: product.title,
                     size: selectedSize,
                     color: selectedColor,
-                    price: 2200000,
+                    price: product.price,
                     quantity: 1,
-                    image: productImages[0],
+                    image: product.images[0],
                 }),
             });
 
@@ -94,6 +114,16 @@ const Page = () => {
         }
     };
 
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center bg-white text-black font-bold uppercase tracking-widest">Memuat...</div>;
+    }
+
+    if (!product) {
+        return <div className="min-h-screen flex items-center justify-center bg-white text-black font-bold uppercase tracking-widest">Produk tidak ditemukan</div>;
+    }
+
+    const productImages = product.images.length > 0 ? product.images : ['/placeholder.jpg'];
+
     return (
         <div className="pt-6 pb-20">
             {/* Breadcrumb */}
@@ -105,7 +135,7 @@ const Page = () => {
                     <li>/</li>
                     <li><Link href="/" className="hover:text-black transition-colors">Pakaian</Link></li>
                     <li>/</li>
-                    <li className="text-black font-semibold">Elegant Dress</li>
+                    <li className="text-black font-semibold">{product.title}</li>
                 </ol>
             </nav>
 
@@ -165,12 +195,14 @@ const Page = () => {
 
                     {/* Product Title */}
                     <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tight text-black leading-tight not-italic">
-                        ELEGANT DRESS COLLECTION
+                        {product.title}
                     </h1>
 
                     {/* Price */}
                     <div className="mt-3 flex items-center gap-3">
-                        <span className="text-xl font-bold text-black">Rp 2.200.000</span>
+                        <span className="text-xl font-bold text-black">
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
+                        </span>
                     </div>
 
                     {/* Ratings */}
@@ -221,11 +253,10 @@ const Page = () => {
                         <button
                             onClick={handleAddToCart}
                             disabled={isAddingToCart}
-                            className={`group w-full h-[52px] font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 transition-colors duration-200 ${
-                                isAddingToCart
+                            className={`group w-full h-[52px] font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 transition-colors duration-200 ${isAddingToCart
                                     ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                                     : 'bg-black text-white hover:bg-gray-800'
-                            }`}
+                                }`}
                         >
                             <span>{isAddingToCart ? 'Menambahkan...' : 'Tambahkan ke Tas'}</span>
                             {!isAddingToCart && (
@@ -234,11 +265,10 @@ const Page = () => {
                         </button>
 
                         {cartMessage && (
-                            <p className={`text-[12px] font-medium text-center py-2 ${
-                                cartMessage.startsWith('✅') ? 'text-green-700 bg-green-50' :
-                                cartMessage.startsWith('⚠️') ? 'text-yellow-700 bg-yellow-50' :
-                                'text-red-700 bg-red-50'
-                            }`}>
+                            <p className={`text-[12px] font-medium text-center py-2 ${cartMessage.startsWith('✅') ? 'text-green-700 bg-green-50' :
+                                    cartMessage.startsWith('⚠️') ? 'text-yellow-700 bg-yellow-50' :
+                                        'text-red-700 bg-red-50'
+                                }`}>
                                 {cartMessage}
                             </p>
                         )}
@@ -297,8 +327,7 @@ const Page = () => {
                         {showDescription && (
                             <div className="pb-6 text-[13px] text-gray-700 leading-relaxed space-y-4">
                                 <p>
-                                    Dress elegan yang dirancang untuk memberikan kenyamanan maksimal dan tampilan yang memukau.
-                                    Dibuat dari bahan premium dengan detail jahitan yang presisi, dress ini cocok untuk berbagai kesempatan.
+                                    {product.description || 'Tidak ada deskripsi untuk produk ini.'}
                                 </p>
                                 <ul className="space-y-2 text-[12px]">
                                     <li className="flex items-start gap-2">
@@ -337,8 +366,8 @@ const Page = () => {
                         {showDetails && (
                             <div className="pb-6 text-[12px] text-gray-700 space-y-2">
                                 <div className="flex justify-between py-1.5 border-b border-gray-100">
-                                    <span className="font-semibold text-black">Kode Artikel</span>
-                                    <span>CX-DR-001</span>
+                                    <span className="font-semibold text-black">SKU</span>
+                                    <span>{product.sku}</span>
                                 </div>
                                 <div className="flex justify-between py-1.5 border-b border-gray-100">
                                     <span className="font-semibold text-black">Warna</span>

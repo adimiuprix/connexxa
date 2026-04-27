@@ -72,7 +72,7 @@ const ProductBox = ({ product }: { product: any }) => {
 
     return (
         <Link
-            href={`/product_items/${product.name}`}
+            href={`/product_items/${product.slug}`}
             ref={containerRef}
             className="min-w-[280px] md:min-w-[320px] bg-white group cursor-pointer border border-transparent hover:border-black transition-all p-2 block"
             onMouseEnter={handleMouseEnter}

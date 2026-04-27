@@ -4,20 +4,27 @@ import Newsletter from '@/components/Newsletter';
 import BrandStory from '@/components/BrandStory';
 import ProductBox from '@/components/ProductBox';
 
-import prisma from '@/libs/prisma';
+interface DbProduct {
+    id: string;
+    title: string;
+    slug: string;
+    price: number;
+    images: string[];
+}
 
 export default async function Home() {
-    const dbProducts = await prisma.product.findMany({
-        take: 10,
-        orderBy: {
-            createdAt: 'desc',
-        },
+    // Mengambil data dari API Route
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/products`, {
+        next: { revalidate: 60 } // Cache data selama 60 detik
     });
+    const dbProducts = await response.json();
 
-    const products = dbProducts.map((product) => ({
+    const products = dbProducts.map((product: DbProduct) => ({
         id: product.id,
-        name: product.title,
-        category: 'Women', // Default category since it's not in the model yet
+        name: product.title || 'Product',
+        slug: product.slug,
+        category: 'Women',
         price: new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -38,7 +45,7 @@ export default async function Home() {
                         PRODUK YANG TERBARU
                     </h2>
                     <div className="flex space-x-4 overflow-x-auto pb-8 scrollbar-hide">
-                        {products.map((product) => (
+                        {products.map((product: any) => (
                             <ProductBox key={product.id} product={product} />
                         ))}
                     </div>

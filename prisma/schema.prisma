@@ -28,7 +28,7 @@ model Product {
   description String?
   price       Int        @default(0) // Harga dalam Rupiah
   stock       Int        @default(0)
-  imageUrl    String?
+  images      String[]   @default([])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }

@@ -4,25 +4,28 @@ import Newsletter from '@/components/Newsletter';
 import BrandStory from '@/components/BrandStory';
 import ProductBox from '@/components/ProductBox';
 
-export default function Home() {
-    const products = [
-        {
-            id: 1,
-            name: 'Elegant Dress 1',
-            category: 'Women',
-            price: 'Rp 2.200.000',
-            image: '/product-images/dress1.1.jpg',
-            hoverImage: '/product-images/dress1.2.jpg',
+import prisma from '@/libs/prisma';
+
+export default async function Home() {
+    const dbProducts = await prisma.product.findMany({
+        take: 10,
+        orderBy: {
+            createdAt: 'desc',
         },
-        {
-            id: 2,
-            name: 'Casual Dress 1',
-            category: 'Women',
-            price: 'Rp 4.000.000',
-            image: '/product-images/dress2.1.jpg',
-            hoverImage: '/product-images/dress2.2.jpg',
-        },
-    ];
+    });
+
+    const products = dbProducts.map((product) => ({
+        id: product.id,
+        name: product.title,
+        category: 'Women', // Default category since it's not in the model yet
+        price: new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+        }).format(product.price),
+        image: product.images[0] || '/placeholder.jpg',
+        hoverImage: product.images[1] || null,
+    }));
 
     return (
         <main className="min-h-screen bg-white">

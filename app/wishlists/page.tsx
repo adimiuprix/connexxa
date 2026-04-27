@@ -21,7 +21,7 @@ const WishlistsPage = () => {
                 return;
             }
 
-            const response = await fetch(`/api/wishlist?userUuid=${user.id}`);
+            const response = await fetch('/api/wishlist');
             const data = await response.json();
             if (response.ok) {
                 setWishlists(data);
@@ -47,10 +47,7 @@ const WishlistsPage = () => {
             const response = await fetch('/api/wishlist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    productId,
-                    userUuid: user.id
-                }),
+                body: JSON.stringify({ productId }),
             });
             if (response.ok) {
                 setWishlists(prev => prev.filter(item => item.productId !== productId));

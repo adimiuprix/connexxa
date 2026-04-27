@@ -81,11 +81,7 @@ const Page = () => {
             const response = await fetch('/api/wishlist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    productId: product.id,
-                    userUuid: user.id,
-                    email: user.email
-                }),
+                body: JSON.stringify({ productId: product.id }),
             });
 
             const data = await response.json();

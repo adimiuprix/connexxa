@@ -1,36 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
-import { createClient } from "@/libs/supabaseServer";
 
 /**
  * POST: Toggle item di Wishlist (Tambah jika belum ada, hapus jika sudah ada)
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await request.json();
-    const { productId } = body;
+    const { productId, userUuid, email } = body;
 
-    if (!productId) {
-      return NextResponse.json({ error: "productId diperlukan" }, { status: 400 });
+    if (!productId || !userUuid) {
+      return NextResponse.json({ error: "productId dan userUuid diperlukan" }, { status: 400 });
     }
 
     // Pastikan user ada di database Prisma kita
     let dbUser = await prisma.user.findUnique({
-      where: { uuid: user.id },
+      where: { uuid: userUuid },
     });
 
     if (!dbUser) {
       dbUser = await prisma.user.create({
         data: {
-          uuid: user.id,
-          email: user.email,
+          uuid: userUuid,
+          email: email || null,
         },
       });
     }
@@ -67,26 +59,33 @@ export async function POST(request: NextRequest) {
         action: "added" 
       });
     }
-  } catch (error) {
-    console.error("Wishlist API Error:", error);
-    return NextResponse.json({ error: "Gagal memproses wishlist" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Wishlist API Error DETAILS:", {
+        message: error.message,
+        code: error.code,
+        stack: error.stack,
+        body: error
+    });
+    return NextResponse.json({ 
+        error: "Gagal memproses wishlist", 
+        details: error.message 
+    }, { status: 500 });
   }
 }
 
 /**
- * GET: Ambil semua wishlist milik user yang sedang login
+ * GET: Ambil semua wishlist milik user berdasarkan userUuid
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const userUuid = request.nextUrl.searchParams.get("userUuid");
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!userUuid) {
+      return NextResponse.json({ error: "userUuid diperlukan" }, { status: 400 });
     }
 
     const dbUser = await prisma.user.findUnique({
-      where: { uuid: user.id },
+      where: { uuid: userUuid },
       include: {
         wishlists: {
           include: {

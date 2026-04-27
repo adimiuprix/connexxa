@@ -254,8 +254,8 @@ const Page = () => {
                             onClick={handleAddToCart}
                             disabled={isAddingToCart}
                             className={`group w-full h-[52px] font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 transition-colors duration-200 ${isAddingToCart
-                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                    : 'bg-black text-white hover:bg-gray-800'
+                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                : 'bg-black text-white hover:bg-gray-800'
                                 }`}
                         >
                             <span>{isAddingToCart ? 'Menambahkan...' : 'Tambahkan ke Tas'}</span>
@@ -266,8 +266,8 @@ const Page = () => {
 
                         {cartMessage && (
                             <p className={`text-[12px] font-medium text-center py-2 ${cartMessage.startsWith('✅') ? 'text-green-700 bg-green-50' :
-                                    cartMessage.startsWith('⚠️') ? 'text-yellow-700 bg-yellow-50' :
-                                        'text-red-700 bg-red-50'
+                                cartMessage.startsWith('⚠️') ? 'text-yellow-700 bg-yellow-50' :
+                                    'text-red-700 bg-red-50'
                                 }`}>
                                 {cartMessage}
                             </p>

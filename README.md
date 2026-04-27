@@ -21,6 +21,7 @@ Connexxa adalah aplikasi web e-commerce fashion modern yang dibangun dengan Next
 ## 🛠️ Pengembangan
 
 ### Persyaratan
+
 - Node.js versi terbaru
 - npm atau yarn
 
@@ -28,13 +29,17 @@ Connexxa adalah aplikasi web e-commerce fashion modern yang dibangun dengan Next
 
 1. Clone repositori ini.
 2. Instal dependensi:
+
    ```bash
    npm install
    ```
+
 3. Jalankan server pengembangan:
+
    ```bash
    npm run dev
    ```
+
 4. Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
 ## 📁 Struktur Folder
@@ -44,3 +49,8 @@ Connexxa adalah aplikasi web e-commerce fashion modern yang dibangun dengan Next
 - `public/`: Aset statis seperti gambar dan ikon.
 - `lib/`: Utilitas dan konfigurasi pendukung.
 
+## Prisma
+
+```bash
+npx prisma generate && npx prisma db push
+```

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { createClient } from '@/libs/supabaseClient';
 import RadioButton from '@/components/RadioButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ShareIcon from '@mui/icons-material/Share';
@@ -62,9 +63,57 @@ const Page = () => {
         return sessionId;
     }, []);
 
+    // Handler: Simpan ke Wishlist
+    const handleAddToWishlist = async () => {
+        if (!product) return;
+
+        // Cek auth
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            setCartMessage('⚠️ Silakan login terlebih dahulu untuk menyimpan ke Wishlist');
+            setTimeout(() => setCartMessage(''), 4000);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/wishlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: product.id }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const icon = data.action === 'added' ? '✅' : '🗑️';
+                setCartMessage(`${icon} ${data.message}`);
+            } else {
+                setCartMessage(`❌ ${data.error || 'Gagal memproses wishlist'}`);
+            }
+        } catch (error) {
+            console.error('Wishlist error:', error);
+            setCartMessage('❌ Terjadi kesalahan koneksi. Coba lagi.');
+        } finally {
+            setTimeout(() => setCartMessage(''), 4000);
+        }
+    };
+
     // Handler: Tambahkan ke Cart
     const handleAddToCart = async () => {
         if (!product) return;
+
+        // Cek apakah user sudah login
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            setCartMessage('⚠️ Silakan login terlebih dahulu untuk belanja');
+            setTimeout(() => setCartMessage(''), 4000);
+            return;
+        }
+
         if (!selectedSize) {
             setCartMessage('⚠️ Silakan pilih ukuran terlebih dahulu');
             setTimeout(() => setCartMessage(''), 3000);
@@ -122,16 +171,16 @@ const Page = () => {
     }));
 
     const reviewCount = product.tot_review || 0;
-    const averageRating = reviewCount > 0 
-        ? product.reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / reviewCount 
+    const averageRating = reviewCount > 0
+        ? product.reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / reviewCount
         : 0;
 
     const renderStars = (rating: number) => {
         return (
             <div className="flex items-center text-black">
                 {[1, 2, 3, 4, 5].map((star) => (
-                    star <= Math.round(rating) 
-                        ? <StarIcon key={star} sx={{ fontSize: 16 }} /> 
+                    star <= Math.round(rating)
+                        ? <StarIcon key={star} sx={{ fontSize: 16 }} />
                         : <StarBorderIcon key={star} sx={{ fontSize: 16 }} />
                 ))}
             </div>
@@ -281,7 +330,7 @@ const Page = () => {
                             </p>
                         )}
 
-                        <button className="w-full h-[52px] bg-white text-black border border-black font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 hover:bg-black hover:text-white transition-all duration-200">
+                        <button onClick={handleAddToWishlist} className="w-full h-[52px] bg-white text-black border border-black font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 hover:bg-black hover:text-white transition-all duration-200">
                             <FavoriteBorderIcon sx={{ fontSize: 18 }} />
                             <span>Simpan ke Wishlist</span>
                         </button>

@@ -23,8 +23,7 @@ export default function Home() {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-            const response = await fetch(`${baseUrl}/api/products`, {
+            const response = await fetch(`/api/products`, {
                 next: { revalidate: 0 },
             });
             const productsData = await response.json();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
@@ -16,12 +16,42 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { createClient } from '@/libs/supabaseClient';
+import {
+    CART_SESSION_KEY,
+    CART_SYNC_CHANNEL,
+    CART_SYNC_EVENT,
+    CART_SYNC_STORAGE_KEY,
+    dispatchCartSync,
+    type CartSyncDetail,
+} from '@/libs/cartSync';
+
+interface CartPreviewItem {
+    id: number;
+    title: string;
+    size: string;
+    color: string;
+    price: number;
+    quantity: number;
+    image?: string | null;
+}
+
+interface CartSnapshot {
+    items: CartPreviewItem[];
+    totalItems: number;
+    totalPrice: number;
+}
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
     const [user, setUser] = useState<any>(null);
+    const [cartCount, setCartCount] = useState(0);
+    const [cartItems, setCartItems] = useState<CartPreviewItem[]>([]);
+    const [cartTotalPrice, setCartTotalPrice] = useState(0);
+    const [isCartPreviewOpen, setIsCartPreviewOpen] = useState(false);
+    const [isCartLoading, setIsCartLoading] = useState(false);
+    const [removingCartItemId, setRemovingCartItemId] = useState<number | null>(null);
 
     // State untuk form dinamis
     const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -40,9 +70,108 @@ const Header = () => {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const formatCurrency = useCallback((amount: number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+        }).format(amount);
+    }, []);
+
+    const applyCartSnapshot = useCallback((data: CartSnapshot) => {
+        setCartCount(data.totalItems || 0);
+        setCartItems(data.items || []);
+        setCartTotalPrice(data.totalPrice || 0);
+    }, []);
+
+    const fetchCartSnapshot = useCallback(async (
+        sessionId?: string,
+        options?: { silent?: boolean }
+    ) => {
+        const activeSessionId = sessionId || localStorage.getItem(CART_SESSION_KEY);
+
+        if (!activeSessionId) {
+            setCartCount(0);
+            setCartItems([]);
+            setCartTotalPrice(0);
+            return null;
+        }
+
+        if (!options?.silent) {
+            setIsCartLoading(true);
+        }
+
+        try {
+            const response = await fetch(`/api/cart?sessionId=${encodeURIComponent(activeSessionId)}`, {
+                cache: 'no-store',
+            });
+
+            if (!response.ok) {
+                return null;
+            }
+
+            const data: CartSnapshot = await response.json();
+            applyCartSnapshot(data);
+            return data;
+        } catch (error) {
+            console.error('Gagal menyinkronkan cart:', error);
+            return null;
+        } finally {
+            if (!options?.silent) {
+                setIsCartLoading(false);
+            }
+        }
+    }, [applyCartSnapshot]);
+
+    const handleCartPreviewOpen = useCallback(() => {
+        setIsCartPreviewOpen(true);
+        void fetchCartSnapshot(undefined, { silent: false });
+    }, [fetchCartSnapshot]);
+
+    const handleCartPreviewClose = useCallback(() => {
+        setIsCartPreviewOpen(false);
+    }, []);
+
+    const handleRemoveCartItem = useCallback(async (itemId: number) => {
+        const sessionId = localStorage.getItem(CART_SESSION_KEY);
+
+        if (!sessionId) {
+            return;
+        }
+
+        setRemovingCartItemId(itemId);
+
+        try {
+            const response = await fetch('/api/cart', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId,
+                    itemId,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Gagal menghapus item dari cart');
+            }
+
+            applyCartSnapshot(data);
+            dispatchCartSync({
+                sessionId,
+                totalItems: data.totalItems,
+            });
+        } catch (error) {
+            console.error('Gagal menghapus item cart:', error);
+        } finally {
+            setRemovingCartItemId(null);
+        }
+    }, [applyCartSnapshot]);
+
     const handleRegisterSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (registerData.password !== registerData.confirmPassword) {
             alert("Konfirmasi kata sandi tidak cocok!");
             return;
@@ -57,9 +186,9 @@ const Header = () => {
             });
 
             if (error) throw error;
-            
+
             alert("Registrasi Berhasil! Silakan cek email Anda untuk verifikasi.");
-            
+
             setRegisterData({ email: '', password: '', confirmPassword: '' });
             handleSwitchMode('login');
         } catch (error: any) {
@@ -95,7 +224,7 @@ const Header = () => {
 
     useEffect(() => {
         const supabase = createClient();
-        
+
         // Ambil data user saat pertama kali load
         const fetchUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
@@ -110,6 +239,78 @@ const Header = () => {
 
         return () => subscription.unsubscribe();
     }, []);
+
+    useEffect(() => {
+        let channel: BroadcastChannel | null = null;
+
+        const handleCartSync: EventListener = (event) => {
+            const detail = (event as CustomEvent<CartSyncDetail>).detail;
+            if (typeof detail?.totalItems === 'number') {
+                setCartCount(detail.totalItems);
+            }
+            if (isCartPreviewOpen || typeof detail?.totalItems !== 'number') {
+                void fetchCartSnapshot(detail?.sessionId, { silent: true });
+            }
+        };
+
+        const handleStorage = (event: StorageEvent) => {
+            if (event.key === CART_SESSION_KEY) {
+                void fetchCartSnapshot(event.newValue || undefined, { silent: true });
+                return;
+            }
+
+            if (event.key === CART_SYNC_STORAGE_KEY && event.newValue) {
+                try {
+                    const detail = JSON.parse(event.newValue) as CartSyncDetail;
+                    if (typeof detail.totalItems === 'number') {
+                        setCartCount(detail.totalItems);
+                    }
+                    if (isCartPreviewOpen || typeof detail.totalItems !== 'number') {
+                        void fetchCartSnapshot(detail.sessionId, { silent: true });
+                    }
+                } catch {
+                    void fetchCartSnapshot(undefined, { silent: true });
+                }
+            }
+        };
+
+        const handleFocus = () => {
+            void fetchCartSnapshot(undefined, { silent: true });
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                void fetchCartSnapshot(undefined, { silent: true });
+            }
+        };
+
+        if (typeof BroadcastChannel !== 'undefined') {
+            channel = new BroadcastChannel(CART_SYNC_CHANNEL);
+            channel.onmessage = (event: MessageEvent<CartSyncDetail>) => {
+                if (typeof event.data?.totalItems === 'number') {
+                    setCartCount(event.data.totalItems);
+                }
+                if (isCartPreviewOpen || typeof event.data?.totalItems !== 'number') {
+                    void fetchCartSnapshot(event.data?.sessionId, { silent: true });
+                }
+            };
+        }
+
+        window.addEventListener(CART_SYNC_EVENT, handleCartSync);
+        window.addEventListener('storage', handleStorage);
+        window.addEventListener('focus', handleFocus);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        void fetchCartSnapshot(undefined, { silent: true });
+
+        return () => {
+            window.removeEventListener(CART_SYNC_EVENT, handleCartSync);
+            window.removeEventListener('storage', handleStorage);
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            channel?.close();
+        };
+    }, [fetchCartSnapshot, isCartPreviewOpen]);
 
     const handleLogout = async () => {
         const supabase = createClient();
@@ -203,7 +404,7 @@ const Header = () => {
                                         {user.email?.split('@')[0]}
                                     </span>
                                 </Link>
-                                <button 
+                                <button
                                     onClick={handleLogout}
                                     className="text-[10px] font-black underline underline-offset-4 hover:no-underline uppercase tracking-tighter"
                                 >
@@ -226,10 +427,92 @@ const Header = () => {
                             <FavoriteBorderIcon sx={{ fontSize: 24 }} />
                         </button>
 
-                        <div className="relative p-1 hover:bg-gray-100 rounded-sm transition-colors cursor-pointer">
-                            <ShoppingBagOutlinedIcon sx={{ fontSize: 24 }} />
-                            <span className="absolute -bottom-1 -right-1 bg-[#0071ae] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">1</span>
+                        {/* Implementasi Cart */}
+                        <div
+                            className="relative"
+                            onMouseEnter={handleCartPreviewOpen}
+                            onMouseLeave={handleCartPreviewClose}
+                        >
+                            <div className="relative p-1 hover:bg-gray-100 rounded-sm transition-colors cursor-pointer">
+                                <ShoppingBagOutlinedIcon sx={{ fontSize: 24 }} />
+                                <span className="absolute -bottom-1 -right-1 bg-[#0071ae] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{cartCount}</span>
+                            </div>
+
+                            {isCartPreviewOpen && (
+                                <div className="absolute right-0 top-full mt-3 w-[360px] bg-white border border-gray-200 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50">
+                                    <div className="absolute inset-x-0 -top-3 h-3" />
+                                    <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-[11px] font-black uppercase tracking-widest text-black">Tas Belanja</p>
+                                            <p className="text-[11px] text-gray-500 mt-1">{cartCount} item di tas</p>
+                                        </div>
+                                        <span className="text-[11px] font-bold text-black">{formatCurrency(cartTotalPrice)}</span>
+                                    </div>
+
+                                    <div className="max-h-[360px] overflow-y-auto">
+                                        {isCartLoading ? (
+                                            <div className="px-4 py-10 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500 animate-pulse">
+                                                Memuat tas...
+                                            </div>
+                                        ) : cartItems.length === 0 ? (
+                                            <div className="px-4 py-10 text-center">
+                                                <p className="text-[11px] font-bold uppercase tracking-widest text-black">Tas masih kosong</p>
+                                                <p className="text-[11px] text-gray-500 mt-2">Tambah produk untuk mulai belanja.</p>
+                                            </div>
+                                        ) : (
+                                            cartItems.map((item) => (
+                                                <div key={item.id} className="px-4 py-3 border-b border-gray-100 last:border-b-0 flex gap-3">
+                                                    <div className="relative w-16 h-16 flex-shrink-0 bg-[#ebedee] overflow-hidden">
+                                                        {item.image ? (
+                                                            <Image
+                                                                src={item.image}
+                                                                alt={item.title}
+                                                                fill
+                                                                sizes="64px"
+                                                                className="object-cover"
+                                                            />
+                                                        ) : null}
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="flex items-start justify-between gap-3">
+                                                            <p className="text-[11px] font-bold uppercase tracking-wide text-black truncate">
+                                                                {item.title}
+                                                            </p>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => void handleRemoveCartItem(item.id)}
+                                                                disabled={removingCartItemId === item.id}
+                                                                className="flex-shrink-0 text-[10px] font-black uppercase tracking-widest text-black underline underline-offset-4 hover:no-underline disabled:text-gray-400 disabled:no-underline"
+                                                            >
+                                                                {removingCartItemId === item.id ? 'Proses...' : 'Hapus'}
+                                                            </button>
+                                                        </div>
+                                                        <p className="text-[11px] text-gray-500 mt-1">
+                                                            Ukuran {item.size} • {item.color}
+                                                        </p>
+                                                        <div className="mt-2 flex items-center justify-between gap-3">
+                                                            <span className="text-[11px] text-gray-500">Qty {item.quantity}</span>
+                                                            <span className="text-[11px] font-bold text-black">
+                                                                {formatCurrency(item.price * item.quantity)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    {!isCartLoading && cartItems.length > 0 && (
+                                        <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-black">Total</span>
+                                            <span className="text-[12px] font-black text-black">{formatCurrency(cartTotalPrice)}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -274,7 +557,7 @@ const Header = () => {
                                 <button type="button" className="underline decoration-1 underline-offset-4 hover:no-underline transition-all">Lupa sandi Anda?</button>
                             </div>
 
-                            <button 
+                            <button
                                 type="submit"
                                 disabled={isLoading}
                                 className="w-full bg-black text-white py-5 font-black uppercase tracking-[0.2em] text-[13px] hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -332,7 +615,7 @@ const Header = () => {
                                 />
                             </div>
 
-                            <button 
+                            <button
                                 type="submit"
                                 disabled={isLoading}
                                 className="w-full bg-black text-white py-5 font-black uppercase tracking-[0.2em] text-[13px] hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -346,7 +629,7 @@ const Header = () => {
                                 <div className="flex-grow border-t border-gray-200"></div>
                             </div>
 
-                            <button 
+                            <button
                                 type="button"
                                 className="w-full bg-white text-black py-4 font-black uppercase tracking-[0.1em] text-[13px] border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm"
                             >

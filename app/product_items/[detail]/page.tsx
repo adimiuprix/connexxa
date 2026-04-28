@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { CART_SESSION_KEY, dispatchCartSync } from '@/libs/cartSync';
 import { createClient } from '@/libs/supabaseClient';
 import RadioButton from '@/components/RadioButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -55,10 +56,10 @@ const Page = () => {
     // Generate atau ambil sessionId dari localStorage
     const getSessionId = useCallback(() => {
         if (typeof window === 'undefined') return '';
-        let sessionId = localStorage.getItem('cart_session_id');
+        let sessionId = localStorage.getItem(CART_SESSION_KEY);
         if (!sessionId) {
             sessionId = crypto.randomUUID();
-            localStorage.setItem('cart_session_id', sessionId);
+            localStorage.setItem(CART_SESSION_KEY, sessionId);
         }
         return sessionId;
     }, []);
@@ -124,11 +125,12 @@ const Page = () => {
         setCartMessage('');
 
         try {
+            const sessionId = getSessionId();
             const response = await fetch('/api/cart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    sessionId: getSessionId(),
+                    sessionId,
                     productId: product.id,
                     title: product.title,
                     size: selectedSize,
@@ -142,6 +144,10 @@ const Page = () => {
             const data = await response.json();
 
             if (response.ok) {
+                dispatchCartSync({
+                    sessionId,
+                    totalItems: data.totalItems,
+                });
                 setCartMessage(`✅ ${data.message} (${data.totalItems} item di tas)`);
             } else {
                 setCartMessage(`❌ ${data.error}`);

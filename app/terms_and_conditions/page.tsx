@@ -1,3 +1,4 @@
+'use client'
 const page = () => {
     return (
         <div className="pt-20 px-4 md:px-8">

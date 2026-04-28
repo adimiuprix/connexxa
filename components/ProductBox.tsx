@@ -84,6 +84,7 @@ const ProductBox = ({ product }: { product: any }) => {
                     src={product.image}
                     alt={product.name}
                     fill
+                    sizes="(min-width: 768px) 320px, 280px"
                     className="object-cover primary-img"
                 />
 
@@ -93,6 +94,7 @@ const ProductBox = ({ product }: { product: any }) => {
                         src={product.hoverImage}
                         alt={`${product.name} hover`}
                         fill
+                        sizes="(min-width: 768px) 320px, 280px"
                         className="object-cover hover-img"
                     />
                 )}

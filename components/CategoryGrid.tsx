@@ -36,14 +36,21 @@ const CategoryCard = ({ cat }: { cat: any }) => {
     const { contextSafe } = useGSAP({ scope: containerRef });
 
     useGSAP(() => {
+        const categoryTextBg = containerRef.current?.querySelector('.category-text-bg');
+
         // Set state awal
         gsap.set(".hover-img", { clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)", scale: 1.05 });
         gsap.set(".primary-img", { scale: 1.05 });
-        gsap.set(".category-text-bg", { scaleY: 0 });
+        if (categoryTextBg) {
+            gsap.set(categoryTextBg, { scaleY: 0 });
+        }
         gsap.set(".philosophy-text", { opacity: 0, y: 10 });
     }, { scope: containerRef });
 
     const handleMouseEnter = contextSafe(() => {
+        const categoryTextBg = containerRef.current?.querySelector('.category-text-bg');
+        const categoryText = containerRef.current?.querySelector('.category-text');
+
         // 1. Efek "Curtain Up" untuk gambar kedua
         gsap.to(".hover-img", {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
@@ -60,17 +67,21 @@ const CategoryCard = ({ cat }: { cat: any }) => {
         });
 
         // 3. Efek blok warna mengisi teks dari bawah ke atas
-        gsap.to(".category-text-bg", {
-            scaleY: 1,
-            transformOrigin: "bottom",
-            duration: 0.5,
-            ease: "expo.inOut",
-        });
-        gsap.to(".category-text", {
-            color: "white",
-            duration: 0.3,
-            delay: 0.1
-        });
+        if (categoryTextBg) {
+            gsap.to(categoryTextBg, {
+                scaleY: 1,
+                transformOrigin: "bottom",
+                duration: 0.5,
+                ease: "expo.inOut",
+            });
+        }
+        if (categoryText) {
+            gsap.to(categoryText, {
+                color: "white",
+                duration: 0.3,
+                delay: 0.1
+            });
+        }
 
         // 4. Efek teks filosofi muncul
         gsap.to(".philosophy-text", {
@@ -83,6 +94,9 @@ const CategoryCard = ({ cat }: { cat: any }) => {
     });
 
     const handleMouseLeave = contextSafe(() => {
+        const categoryTextBg = containerRef.current?.querySelector('.category-text-bg');
+        const categoryText = containerRef.current?.querySelector('.category-text');
+
         // 1. Gambar kedua turun lagi (Curtain Down)
         gsap.to(".hover-img", {
             clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
@@ -99,16 +113,20 @@ const CategoryCard = ({ cat }: { cat: any }) => {
         });
 
         // 3. Efek blok warna keluar ke atas
-        gsap.to(".category-text-bg", {
-            scaleY: 0,
-            transformOrigin: "top",
-            duration: 0.5,
-            ease: "expo.inOut"
-        });
-        gsap.to(".category-text", {
-            color: "black",
-            duration: 0.3
-        });
+        if (categoryTextBg) {
+            gsap.to(categoryTextBg, {
+                scaleY: 0,
+                transformOrigin: "top",
+                duration: 0.5,
+                ease: "expo.inOut"
+            });
+        }
+        if (categoryText) {
+            gsap.to(categoryText, {
+                color: "black",
+                duration: 0.3
+            });
+        }
 
         // 4. Efek teks filosofi menghilang
         gsap.to(".philosophy-text", {
@@ -132,6 +150,8 @@ const CategoryCard = ({ cat }: { cat: any }) => {
                 src={cat.image}
                 alt={cat.title}
                 fill
+                sizes="(min-width: 768px) 33vw, 100vw"
+                loading="eager"
                 className="object-cover primary-img opacity-90"
             />
             {/* Hover Image */}
@@ -140,6 +160,7 @@ const CategoryCard = ({ cat }: { cat: any }) => {
                     src={cat.hoverImage}
                     alt={`${cat.title} hover`}
                     fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
                     className="object-cover hover-img"
                 />
             )}

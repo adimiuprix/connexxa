@@ -4,6 +4,8 @@ import Newsletter from '@/components/Newsletter';
 import BrandStory from '@/components/BrandStory';
 import ProductBox from '@/components/ProductBox';
 
+export const dynamic = 'force-dynamic';
+
 interface DbProduct {
     id: string;
     title: string;

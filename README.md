@@ -53,4 +53,5 @@ Connexxa adalah aplikasi web e-commerce fashion modern yang dibangun dengan Next
 
 ```bash
 npx prisma generate && npx prisma db push
+npx prisma db push --force-reset && npx prisma db seed
 ```

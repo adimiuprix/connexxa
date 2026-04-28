@@ -6,7 +6,7 @@ import ProductBox from '@/components/ProductBox';
 
 export const dynamic = 'force-dynamic';
 
-interface DbProduct {
+interface Product {
     id: string;
     title: string;
     slug: string;
@@ -18,11 +18,11 @@ export default async function Home() {
     // Mengambil data dari API Route
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/products`, {
-        next: { revalidate: 60 } // Cache data selama 60 detik
+        next: { revalidate: 0 }
     });
-    const dbProducts = await response.json();
+    const products = await response.json();
 
-    const products = dbProducts.map((product: DbProduct) => ({
+    const productsData = products.map((product: Product) => ({
         id: product.id,
         name: product.title || 'Product',
         slug: product.slug,
@@ -47,7 +47,7 @@ export default async function Home() {
                         PRODUK YANG TERBARU
                     </h2>
                     <div className="flex space-x-4 overflow-x-auto pb-8 scrollbar-hide">
-                        {products.map((product: any) => (
+                        {productsData.map((product: Product) => (
                             <ProductBox key={product.id} product={product} />
                         ))}
                     </div>

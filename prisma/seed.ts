@@ -93,54 +93,6 @@ async function main() {
                 getPublicUrl("t-shirt-2.jpg"),
             ],
         },
-        {
-            sku: "PROD-002",
-            title: "Slim Fit Denim Jeans",
-            slug: "slim-fit-denim-jeans",
-            description: "Classic slim fit denim jeans with a modern touch. Durable and versatile.",
-            price: 450000,
-            stock: 30,
-            images: [
-                getPublicUrl("jeans-1.jpg"),
-                getPublicUrl("jeans-2.jpg"),
-            ],
-        },
-        {
-            sku: "PROD-003",
-            title: "Minimalist Leather Backpack",
-            slug: "minimalist-leather-backpack",
-            description: "Sleek and functional leather backpack for the modern professional.",
-            price: 850000,
-            stock: 15,
-            images: [
-                getPublicUrl("backpack-1.jpg"),
-                getPublicUrl("backpack-2.jpg"),
-            ],
-        },
-        {
-            sku: "PROD-004",
-            title: "Wireless Noise-Canceling Headphones",
-            slug: "wireless-noise-canceling-headphones",
-            description: "Experience pure sound with our latest noise-canceling technology.",
-            price: 2500000,
-            stock: 20,
-            images: [
-                getPublicUrl("headphones-1.jpg"),
-                getPublicUrl("headphones-2.jpg"),
-            ],
-        },
-        {
-            sku: "PROD-005",
-            title: "Smart Sports Watch",
-            slug: "smart-sports-watch",
-            description: "Track your fitness and stay connected with this advanced smart watch.",
-            price: 1200000,
-            stock: 25,
-            images: [
-                getPublicUrl("watch-1.jpg"),
-                getPublicUrl("watch-2.jpg"),
-            ],
-        },
     ];
 
     for (const productData of productsData) {

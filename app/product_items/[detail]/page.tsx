@@ -162,9 +162,9 @@ const Page = () => {
         return <div className="min-h-screen flex items-center justify-center bg-white text-black font-bold uppercase tracking-widest">Produk tidak ditemukan</div>;
     }
 
-    const productImages = product.images.length > 0 ? product.images : ['/placeholder.jpg'];
+    const productImages: string[] = product.images.length > 0 ? product.images : ['/placeholder.jpg'];
 
-    const sizeOptions = product.sizes.map((ps: any) => ({
+    const sizeOptions: { label: string; value: string; disabled: boolean }[] = product.sizes.map((ps: any) => ({
         label: ps.size.value,
         value: ps.size.value,
         disabled: ps.available !== 'true'
@@ -210,7 +210,7 @@ const Page = () => {
 
                     {/* Thumbnail Strip */}
                     <div className="flex lg:flex-col gap-1 px-4 lg:px-2 lg:pl-4 mt-2 lg:mt-0 overflow-x-auto lg:overflow-y-auto lg:max-h-[700px]">
-                        {productImages.map((img, i) => (
+                        {productImages.map((img: string, i: number) => (
                             <button
                                 key={i}
                                 onClick={() => setSelectedImage(i)}

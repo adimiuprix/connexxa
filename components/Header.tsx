@@ -8,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Menu from './Menu';
 import Modal from './Modal';
 import FormInput from './FormInput';
@@ -42,6 +43,7 @@ interface CartSnapshot {
 }
 
 const Header = () => {
+    const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -423,7 +425,17 @@ const Header = () => {
                             </button>
                         )}
 
-                        <button className="p-1 text-black hover:bg-gray-100 rounded-sm transition-colors">
+                        <button
+                            onClick={() => {
+                                if (user) {
+                                    router.push('/wishlists');
+                                } else {
+                                    setAuthMode('login');
+                                    setIsAuthOpen(true);
+                                }
+                            }}
+                            className="p-1 text-black hover:bg-gray-100 rounded-sm transition-colors"
+                        >
                             <FavoriteBorderIcon sx={{ fontSize: 24 }} />
                         </button>
 
@@ -439,7 +451,7 @@ const Header = () => {
                             </div>
 
                             {isCartPreviewOpen && (
-                                <div className="absolute right-0 top-full mt-3 w-[360px] bg-white border border-gray-200 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50">
+                                <div className="absolute right-0 top-full mt-3 w-[calc(100vw-2rem)] max-w-[360px] bg-white border border-gray-200 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50">
                                     <div className="absolute inset-x-0 -top-3 h-3" />
                                     <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                                         <div>

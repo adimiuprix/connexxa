@@ -85,8 +85,9 @@ export default function Carousel() {
                             src={image.src}
                             alt={image.title}
                             fill
+                            sizes="100vw"
                             className={`image-${index} object-cover object-center`}
-                            priority={index === 0}
+                            priority
                         />
                         {/* Adidas Style Overlay */}
                         <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-20 lg:px-32 z-20">

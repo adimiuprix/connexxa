@@ -230,6 +230,7 @@ const Page = () => {
                                     src={img}
                                     alt={`Product thumbnail ${i + 1}`}
                                     fill
+                                    sizes="72px"
                                     className="object-cover"
                                 />
                             </button>
@@ -243,6 +244,7 @@ const Page = () => {
                                 src={productImages[selectedImage]}
                                 alt="Product image"
                                 fill
+                                sizes="(min-width: 1024px) 60vw, 100vw"
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                                 priority
                             />

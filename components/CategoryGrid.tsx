@@ -151,7 +151,6 @@ const CategoryCard = ({ cat }: { cat: any }) => {
                 alt={cat.title}
                 fill
                 sizes="(min-width: 768px) 33vw, 100vw"
-                loading="eager"
                 className="object-cover primary-img opacity-90"
             />
             {/* Hover Image */}

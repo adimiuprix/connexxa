@@ -400,7 +400,7 @@ const Header = () => {
                     <div className="flex items-center space-x-2 lg:space-x-4">
                         {user ? (
                             <div className="flex items-center space-x-3">
-                                <Link href="/dashboard" className="p-1 text-black hover:bg-gray-100 rounded-sm transition-colors flex items-center gap-1">
+                                <Link href="/account/profile" className="p-1 text-black hover:bg-gray-100 rounded-sm transition-colors flex items-center gap-1">
                                     <PersonOutlinedIcon sx={{ fontSize: 24 }} />
                                     <span className="hidden lg:block text-[10px] font-bold uppercase tracking-tighter max-w-[100px] truncate">
                                         {user.email?.split('@')[0]}

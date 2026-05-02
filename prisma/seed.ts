@@ -79,6 +79,25 @@ async function main() {
         console.log(`Created size: ${createdSize.value}`);
     }
 
+    // 3. Create Categories
+    const categoriesData = [
+        { name: "Footwear (Sepatu)", slug: "footwear" },
+        { name: "Apparel (Pakaian)", slug: "apparel" },
+        { name: "Equipment (Peralatan)", slug: "equipment" },
+        { name: "Accessories (Aksesoris)", slug: "accessories" },
+    ];
+
+    const categories = [];
+    for (const category of categoriesData) {
+        const createdCategory = await prisma.category.upsert({
+            where: { slug: category.slug },
+            update: category,
+            create: category,
+        });
+        categories.push(createdCategory);
+        console.log(`Created category: ${createdCategory.name}`);
+    }
+
     // 3. Create Products
     const productsData = [
         {
@@ -92,6 +111,8 @@ async function main() {
                 getPublicUrl("t-shirt-1.jpg"),
                 getPublicUrl("t-shirt-2.jpg"),
             ],
+            // Mengaitkan produk ini dengan kategori Apparel
+            categoryId: categories.find(c => c.slug === 'apparel')?.id,
         },
     ];
 

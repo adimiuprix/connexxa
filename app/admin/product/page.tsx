@@ -16,7 +16,7 @@ export default function AdminProduk() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('/api/products');
+                const response = await fetch('/api/admin/product');
                 if (response.ok) {
                     const data = await response.json();
                     setProducts(data as Product[]);

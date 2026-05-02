@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 // Pastikan kunci ini ada di .env Anda!
 const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
         auth: {
             persistSession: false,
@@ -18,7 +18,7 @@ const supabaseAdmin = createClient(
 export async function uploadImageAction(formData: FormData) {
     const file = formData.get("file") as File;
     const bucket = process.env.BUCKET_NAME || "decrodet";
-    
+
     if (!file) throw new Error("No file provided");
 
     const fileExt = file.name.split('.').pop();

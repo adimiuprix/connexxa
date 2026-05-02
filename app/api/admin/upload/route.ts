@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 // Inisialisasi Supabase dengan Service Role Key untuk bypass RLS
 const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
         auth: {
             persistSession: false,
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const file = formData.get("file") as File;
-        const bucket = process.env.BUCKET_NAME || "decrodet";
+        const bucket = process.env.BUCKET_NAME;
 
         if (!file) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });

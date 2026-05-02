@@ -11,9 +11,9 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 // Supabase Storage Configuration
-const SUPABASE_PROJECT_ID = process.env.SUPABASE_PROJECT_ID || "frumqoxwisgigytdlvlj";
-const SUPABASE_URL = `https://${SUPABASE_PROJECT_ID}.supabase.co`;
-const BUCKET_NAME = process.env.BUCKET_NAME || "decrodet";
+const NEXT_SUPABASE_PROJECT_ID = process.env.NEXT_SUPABASE_PROJECT_ID;
+const SUPABASE_URL = `https://${NEXT_SUPABASE_PROJECT_ID}.supabase.co`;
+const BUCKET_NAME = process.env.BUCKET_NAME;
 
 const getPublicUrl = (path: string) => {
     return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/products/${path}`;

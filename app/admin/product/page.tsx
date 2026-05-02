@@ -29,7 +29,7 @@ export default function AdminProduk() {
                 setIsLoading(false);
             }
         };
-        
+
         fetchProducts();
     }, []);
 
@@ -55,6 +55,28 @@ export default function AdminProduk() {
             currency: 'IDR',
             minimumFractionDigits: 0,
         }).format(amount);
+    };
+
+    const handleDelete = async (productId: number) => {
+        if (!confirm("Are you sure you want to delete this product?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/admin/product?id=${productId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setProducts(products.filter(p => p.id !== productId));
+                alert("Product deleted successfully!");
+            } else {
+                alert("Failed to delete product");
+            }
+        } catch (error) {
+            console.error("Error deleting product:", error);
+            alert("Error deleting product");
+        }
     };
 
     return (
@@ -132,7 +154,7 @@ export default function AdminProduk() {
                                     const status = product.stock > 10 ? 'Active' : product.stock > 0 ? 'Low Stock' : 'Out of Stock';
                                     const img = product.images.length > 0 ? product.images[0] : "👕";
                                     const price = formatCurrency(product.price);
-                                    
+
                                     return (
                                         <tr key={product.id} className="hover:bg-gray-50 transition-all group">
                                             <td className="py-10 text-sm font-black tracking-tight">{product.sku}</td>
@@ -152,11 +174,10 @@ export default function AdminProduk() {
                                             <td className="py-10 text-base font-black italic">{price}</td>
                                             <td className="py-10 text-sm font-black">{product.stock}</td>
                                             <td className="py-10">
-                                                <span className={`px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em] border-2 ${
-                                                    status === 'Active' ? 'border-green-600 text-green-700 bg-green-50' :
+                                                <span className={`px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em] border-2 ${status === 'Active' ? 'border-green-600 text-green-700 bg-green-50' :
                                                     status === 'Low Stock' ? 'border-orange-600 text-orange-700 bg-orange-50' :
-                                                    'border-red-600 text-red-700 bg-red-50'
-                                                }`}>
+                                                        'border-red-600 text-red-700 bg-red-50'
+                                                    }`}>
                                                     {status}
                                                 </span>
                                             </td>
@@ -167,7 +188,7 @@ export default function AdminProduk() {
                                                 >
                                                     Edit
                                                 </button>
-                                                <button className="px-5 py-3 bg-red-50 text-red-600 border-2 border-transparent hover:border-red-600 font-black uppercase text-[11px] transition-all tracking-widest">Hapus</button>
+                                                <button onClick={() => handleDelete(product.id)} className="px-5 py-3 bg-red-50 text-red-600 border-2 border-transparent hover:border-red-600 font-black uppercase text-[11px] transition-all tracking-widest">Hapus</button>
                                             </td>
                                         </tr>
                                     );

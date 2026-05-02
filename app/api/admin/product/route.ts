@@ -20,32 +20,65 @@ export async function POST(request: NextRequest) {
     try {
         const data = await request.json();
 
-        // Validasi field yang sesuai dengan schema Prisma (Product)
         if (!data.title || data.price === undefined) {
             return NextResponse.json({ error: "Missing required fields: title, price" }, { status: 400 });
         }
 
-        // Generate SKU & slug otomatis jika tidak diberikan
         const sku = data.sku || `PRD-${Math.floor(Math.random() * 1000000)}`;
-        const slug = data.slug || data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(Math.random() * 1000);
+        const baseSlug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const slug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
 
-        const product = await prisma.product.create({
-            data: {
-                sku: sku,
-                title: data.title,
-                slug: slug,
-                description: data.description || "",
-                price: parseInt(data.price) || 0,
-                stock: parseInt(data.stock) || 0,
-                images: data.images ? (Array.isArray(data.images) ? data.images : [data.images]) : [],
-                categoryId: data.categoryId ? parseInt(data.categoryId) : null
+        const product = await prisma.$transaction(async (tx) => {
+            let categoryId = data.categoryId ? parseInt(data.categoryId) : null;
+            
+            if (!categoryId && data.categorySlug) {
+                const category = await tx.category.findUnique({
+                    where: { slug: data.categorySlug }
+                });
+                if (category) categoryId = category.id;
             }
+
+            const newProduct = await tx.product.create({
+                data: {
+                    sku: sku,
+                    title: data.title,
+                    slug: slug,
+                    description: data.description || "",
+                    price: parseInt(data.price) || 0,
+                    stock: parseInt(data.stock) || 0,
+                    images: data.images ? (Array.isArray(data.images) ? data.images : [data.images]) : [],
+                    colors: data.colors ? (Array.isArray(data.colors) ? data.colors : [data.colors]) : [],
+                    categoryId: categoryId
+                }
+            });
+
+            if (data.sizes && Array.isArray(data.sizes) && data.sizes.length > 0) {
+                const sizeRecords = await tx.size.findMany({
+                    where: { value: { in: data.sizes } }
+                });
+
+                for (const s of sizeRecords) {
+                    await tx.productSize.create({
+                        data: {
+                            productId: newProduct.id,
+                            sizeId: s.id,
+                            available: "true"
+                        }
+                    });
+                }
+            }
+
+            return newProduct;
         });
 
         return NextResponse.json(product, { status: 201 });
-    } catch (error) {
+
+    } catch (error: any) {
         console.error("Error creating product:", error);
-        return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+        return NextResponse.json({ 
+            error: "Failed to create product", 
+            message: error.message
+        }, { status: 500 });
     }
 }
 
@@ -77,6 +110,7 @@ export async function PUT(request: NextRequest) {
         if (data.price !== undefined) updateData.price = data.price;
         if (data.stock !== undefined) updateData.stock = data.stock;
         if (data.images) updateData.images = data.images;
+        if (data.colors) updateData.colors = data.colors;
         if (data.categoryId !== undefined) updateData.categoryId = data.categoryId ? parseInt(data.categoryId) : null;
 
         const product = await prisma.product.update({

@@ -6,15 +6,19 @@ import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import ButtonDark from "@/components/ButtonDark";
 import FormInput from "@/components/FormInput";
+import MediaUpload from "@/components/MediaUpload";
 
 export default function AddProductPage() {
     const containerRef = useRef(null);
     const router = useRouter();
-    const [productName, setProductName] = useState('');
-    const [productDescription, setProductDescription] = useState('');
-    const [productPrice, setProductPrice] = useState('');
-    const [productStock, setProductStock] = useState('');
-    const [productImage, setProductImage] = useState('');
+    const [productName, setProductName] = useState<string>('');
+    const [productDescription, setProductDescription] = useState<string>('');
+    const [productPrice, setProductPrice] = useState<string>('');
+    const [productStock, setProductStock] = useState<string>('');
+    const [productSku, setProductSku] = useState<string>('');
+    const [productCategory, setProductCategory] = useState<string>('footwear');
+    const [productColors, setProductColors] = useState<string>('');
+    const [productImage, setProductImage] = useState<File[]>([]);
     const [productSizes, setProductSizes] = useState<string[]>(['S', 'M', 'L', 'XL']);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
 
@@ -22,7 +26,7 @@ export default function AddProductPage() {
         setProductName(e.target.value);
     };
 
-    const handleProductDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleProductDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setProductDescription(e.target.value);
     };
 
@@ -34,8 +38,16 @@ export default function AddProductPage() {
         setProductStock(e.target.value);
     };
 
-    const handleProductImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setProductImage(e.target.value);
+    const handleProductSkuChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProductSku(e.target.value);
+    };
+
+    const handleProductCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setProductCategory(e.target.value);
+    };
+
+    const handleProductColorsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProductColors(e.target.value);
     };
 
     const toggleSize = (size: string) => {
@@ -59,6 +71,44 @@ export default function AddProductPage() {
             }
         );
     }, { scope: containerRef });
+
+    const handleAddProduct = async () => {
+        // kirim ke api /api/admin/product
+        const response = await fetch('/api/admin/product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: productName,
+                description: productDescription,
+                price: productPrice,
+                stock: productStock,
+                sku: productSku,
+                categorySlug: productCategory,
+                colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
+                sizes: selectedSizes,
+                images: [], 
+            }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            router.push('/admin/product');
+            // Reset form
+            setProductName('');
+            setProductDescription('');
+            setProductPrice('');
+            setProductStock('');
+            setProductSku('');
+            setProductCategory('footwear');
+            setProductColors('');
+            setSelectedSizes([]);
+            setProductImage([]);
+        } else {
+            console.error("API Error:", data);
+            alert(`Gagal menyimpan produk: ${data.message || data.error || 'Terjadi kesalahan server'}`);
+        }
+    };
 
     return (
         <div ref={containerRef} className="w-full min-h-screen bg-white font-sans selection:bg-black selection:text-white pb-32">
@@ -101,8 +151,8 @@ export default function AddProductPage() {
                                         type="text"
                                         id="productName"
                                         label="Nama Produk"
-                                        value=""
-                                        onChange={() => { }}
+                                        value={productName}
+                                        onChange={handleProductNameChange}
                                         placeholder="CONTOH: ADICOLOR CLASSICS HOODIE"
                                         className="!border-2 !border-transparent hover:!border-black focus:!border-black !px-6 !py-4 !text-sm !font-black !italic !uppercase"
                                     />
@@ -112,6 +162,8 @@ export default function AddProductPage() {
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Deskripsi</label>
                                     <textarea
                                         rows={5}
+                                        value={productDescription}
+                                        onChange={handleProductDescriptionChange}
                                         placeholder="DESKRIPSIKAN DETAIL MATERIAL, POTONGAN, DAN GAYA PRODUK..."
                                         className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-sm font-bold outline-none transition-all resize-none"
                                     ></textarea>
@@ -120,17 +172,7 @@ export default function AddProductPage() {
                         </div>
 
                         {/* Media / Images */}
-                        <div className="form-section bg-white p-10 border border-gray-100 hover:border-black transition-all">
-                            <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8 pb-4 border-b-4 border-black">Media Produk</h2>
-
-                            <div className="border-2 border-dashed border-gray-300 hover:border-black p-12 flex flex-col items-center justify-center cursor-pointer transition-all bg-gray-50 group">
-                                <div className="w-16 h-16 bg-white border-2 border-black flex items-center justify-center mb-4 group-hover:-translate-y-2 transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-                                </div>
-                                <span className="text-sm font-black uppercase italic tracking-widest text-black">Klik atau Tarik Gambar</span>
-                                <span className="text-[10px] font-bold text-gray-400 mt-2 tracking-[0.1em] uppercase">PNG, JPG, WEBP (MAX. 5MB)</span>
-                            </div>
-                        </div>
+                        <MediaUpload onImagesChange={(files) => setProductImage(files)} />
 
                     </div>
 
@@ -148,6 +190,8 @@ export default function AddProductPage() {
                                         <span className="absolute left-6 top-1/2 -translate-y-1/2 text-sm font-black italic z-10">$</span>
                                         <FormInput
                                             type="number"
+                                            value={productPrice}
+                                            onChange={handleProductPriceChange}
                                             placeholder="0.00"
                                             className="!border-2 !border-transparent hover:!border-black focus:!border-black !pl-10 !pr-6 !py-4 !text-sm !font-black !italic"
                                         />
@@ -158,6 +202,8 @@ export default function AddProductPage() {
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Kuantitas Stok</label>
                                     <FormInput
                                         type="number"
+                                        value={productStock}
+                                        onChange={handleProductStockChange}
                                         placeholder="0"
                                         className="!border-2 !border-transparent hover:!border-black focus:!border-black !px-6 !py-4 !text-sm !font-black !italic"
                                     />
@@ -167,6 +213,8 @@ export default function AddProductPage() {
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">SKU (Opsional)</label>
                                     <FormInput
                                         type="text"
+                                        value={productSku}
+                                        onChange={handleProductSkuChange}
                                         placeholder="CONTOH: FTR-092-BLK"
                                         className="!border-2 !border-transparent hover:!border-black focus:!border-black !px-6 !py-4 !text-sm !font-black !italic !uppercase"
                                     />
@@ -181,11 +229,27 @@ export default function AddProductPage() {
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Kategori</label>
-                                    <select className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-[12px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none">
+                                    <select
+                                        value={productCategory}
+                                        onChange={handleProductCategoryChange}
+                                        className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-[12px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none"
+                                    >
                                         <option value="footwear">Footwear (Sepatu)</option>
                                         <option value="apparel">Apparel (Pakaian)</option>
-                                        <option value="accessories">Accessories</option>
+                                        <option value="equipment">Equipment (Peralatan)</option>
+                                        <option value="accessories">Accessories (Aksesoris)</option>
                                     </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Warna (Pisahkan dengan koma)</label>
+                                    <FormInput
+                                        type="text"
+                                        value={productColors}
+                                        onChange={handleProductColorsChange}
+                                        placeholder="CONTOH: Black, White, Red"
+                                        className="!border-2 !border-transparent hover:!border-black focus:!border-black !px-6 !py-4 !text-sm !font-black !italic !uppercase"
+                                    />
                                 </div>
 
                                 <div>
@@ -210,6 +274,7 @@ export default function AddProductPage() {
 
                         <div className="form-section pt-6">
                             <ButtonDark
+                                onClick={() => { handleAddProduct() }}
                                 text="SIMPAN PRODUK"
                                 fullWidth
                                 className="py-6 !text-sm !tracking-[0.3em] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"

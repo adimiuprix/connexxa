@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import gsap from "gsap";
+import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import StatCard from "@/components/StatCard";
 import ButtonDark from "@/components/ButtonDark";
@@ -46,6 +47,8 @@ export default function AdminDashboard() {
         );
     }, { scope: containerRef });
 
+    const router = useRouter();
+
     return (
         <div ref={containerRef} className="w-full bg-white font-sans selection:bg-black selection:text-white pb-32">
             {/* Internal Page Container */}
@@ -65,6 +68,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex flex-wrap gap-4 mb-2">
                         <ButtonDark
+                            onClick={() => router.push("/admin/product")}
                             text="Atur Produk"
                             outline
                             className="px-12 py-5 !italic !text-xs !tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"

@@ -1,14 +1,37 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import ButtonDark from "@/components/ButtonDark";
+import type { Product } from "@/generated/prisma";
 
 export default function AdminProduk() {
     const containerRef = useRef(null);
     const router = useRouter();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch('/api/products');
+                if (response.ok) {
+                    const data = await response.json();
+                    setProducts(data as Product[]);
+                } else {
+                    console.error("Failed to fetch products");
+                }
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        fetchProducts();
+    }, []);
 
     useGSAP(() => {
         // Section Blocks Entrance
@@ -25,6 +48,14 @@ export default function AdminProduk() {
             }
         );
     }, { scope: containerRef });
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+        }).format(amount);
+    };
 
     return (
         <div ref={containerRef} className="w-full bg-white font-sans selection:bg-black selection:text-white pb-32">
@@ -84,45 +115,63 @@ export default function AdminProduk() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {[
-                                    { id: "PRD-001", name: "Superstar Classic", category: "Footwear", price: "$100.00", stock: 120, status: "Active", img: "👟" },
-                                    { id: "PRD-002", name: "Adicolor Hoodie", category: "Apparel", price: "$85.00", stock: 45, status: "Active", img: "🧥" },
-                                    { id: "PRD-003", name: "NMD R1 Runner", category: "Footwear", price: "$140.00", stock: 8, status: "Low Stock", img: "👟" },
-                                    { id: "PRD-004", name: "Tiro 23 Tracksuit", category: "Activewear", price: "$65.00", stock: 0, status: "Out of Stock", img: "👕" },
-                                    { id: "PRD-005", name: "Samba OG (White)", category: "Footwear", price: "$110.00", stock: 3, status: "Low Stock", img: "👟" },
-                                ].map((product, i) => (
-                                    <tr key={i} className="hover:bg-gray-50 transition-all group">
-                                        <td className="py-10 text-sm font-black tracking-tight">{product.id}</td>
-                                        <td className="py-10">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 bg-[#ebedee] flex items-center justify-center text-2xl group-hover:rotate-6 transition-transform duration-500">
-                                                    {product.img}
-                                                </div>
-                                                <span className="text-base font-black uppercase italic tracking-tighter">{product.name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="py-10 text-xs font-bold text-gray-500 uppercase tracking-tight">{product.category}</td>
-                                        <td className="py-10 text-base font-black italic">{product.price}</td>
-                                        <td className="py-10 text-sm font-black">{product.stock}</td>
-                                        <td className="py-10">
-                                            <span className={`px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em] border-2 ${product.status === 'Active' ? 'border-green-600 text-green-700 bg-green-50' :
-                                                    product.status === 'Low Stock' ? 'border-orange-600 text-orange-700 bg-orange-50' :
-                                                        'border-red-600 text-red-700 bg-red-50'
-                                                }`}>
-                                                {product.status}
-                                            </span>
-                                        </td>
-                                        <td className="py-10 text-right">
-                                            <button 
-                                                onClick={() => router.push(`/admin/product/edit/${product.id}`)}
-                                                className="px-5 py-3 mr-2 bg-white border-2 border-transparent hover:border-black font-black uppercase text-[11px] transition-all tracking-widest"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button className="px-5 py-3 bg-red-50 text-red-600 border-2 border-transparent hover:border-red-600 font-black uppercase text-[11px] transition-all tracking-widest">Hapus</button>
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan={7} className="py-10 text-center font-bold uppercase tracking-widest text-gray-500 text-sm">
+                                            MEMUAT DATA...
                                         </td>
                                     </tr>
-                                ))}
+                                ) : products.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={7} className="py-10 text-center font-bold uppercase tracking-widest text-gray-500 text-sm">
+                                            Belum ada produk di database
+                                        </td>
+                                    </tr>
+                                ) : products.map((product, i) => {
+                                    // Derived and formatted values
+                                    const status = product.stock > 10 ? 'Active' : product.stock > 0 ? 'Low Stock' : 'Out of Stock';
+                                    const img = product.images.length > 0 ? product.images[0] : "👕";
+                                    const price = formatCurrency(product.price);
+                                    
+                                    return (
+                                        <tr key={product.id} className="hover:bg-gray-50 transition-all group">
+                                            <td className="py-10 text-sm font-black tracking-tight">{product.sku}</td>
+                                            <td className="py-10">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="w-14 h-14 bg-[#ebedee] flex items-center justify-center text-2xl group-hover:rotate-6 transition-transform duration-500 overflow-hidden relative">
+                                                        {(img.startsWith('http') || img.startsWith('/')) ? (
+                                                            <img src={img} alt={product.title} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            img
+                                                        )}
+                                                    </div>
+                                                    <span className="text-base font-black uppercase italic tracking-tighter">{product.title}</span>
+                                                </div>
+                                            </td>
+                                            <td className="py-10 text-xs font-bold text-gray-500 uppercase tracking-tight">General</td>
+                                            <td className="py-10 text-base font-black italic">{price}</td>
+                                            <td className="py-10 text-sm font-black">{product.stock}</td>
+                                            <td className="py-10">
+                                                <span className={`px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em] border-2 ${
+                                                    status === 'Active' ? 'border-green-600 text-green-700 bg-green-50' :
+                                                    status === 'Low Stock' ? 'border-orange-600 text-orange-700 bg-orange-50' :
+                                                    'border-red-600 text-red-700 bg-red-50'
+                                                }`}>
+                                                    {status}
+                                                </span>
+                                            </td>
+                                            <td className="py-10 text-right">
+                                                <button
+                                                    onClick={() => router.push(`/admin/product/edit/${product.id}`)}
+                                                    className="px-5 py-3 mr-2 bg-white border-2 border-transparent hover:border-black font-black uppercase text-[11px] transition-all tracking-widest"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button className="px-5 py-3 bg-red-50 text-red-600 border-2 border-transparent hover:border-red-600 font-black uppercase text-[11px] transition-all tracking-widest">Hapus</button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

@@ -4,9 +4,37 @@ import prisma from "@/libs/prisma";
 
 export async function GET(request: NextRequest) {
     try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+
+        if (id) {
+            const product = await prisma.product.findUnique({
+                where: {
+                    id: parseInt(id)
+                },
+                include: {
+                    category: true,
+                    sizes: {
+                        include: {
+                            size: true
+                        }
+                    }
+                }
+            });
+
+            if (!product) {
+                return NextResponse.json({ error: "Product not found" }, { status: 404 });
+            }
+
+            return NextResponse.json(product);
+        }
+
         const products = await prisma.product.findMany({
             orderBy: {
                 createdAt: "desc"
+            },
+            include: {
+                category: true
             }
         });
         return NextResponse.json(products);
@@ -92,38 +120,68 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
         }
 
-        // Validasi field yang sesuai dengan schema Prisma
-        if (data.price !== undefined && typeof data.price !== 'number') {
-            data.price = parseInt(data.price);
-        }
+        const productId = parseInt(id);
 
-        if (data.stock !== undefined && typeof data.stock !== 'number') {
-            data.stock = parseInt(data.stock);
-        }
+        const result = await prisma.$transaction(async (tx) => {
+            // 1. Mencari categoryId berdasarkan categorySlug jika ada
+            let categoryId = data.categoryId ? parseInt(data.categoryId) : undefined;
+            if (!categoryId && data.categorySlug) {
+                const category = await tx.category.findUnique({
+                    where: { slug: data.categorySlug }
+                });
+                if (category) categoryId = category.id;
+            }
 
-        // Hanya update field yang ada di schema Product
-        const updateData: any = {};
-        if (data.sku) updateData.sku = data.sku;
-        if (data.title) updateData.title = data.title;
-        if (data.slug) updateData.slug = data.slug;
-        if (data.description) updateData.description = data.description;
-        if (data.price !== undefined) updateData.price = data.price;
-        if (data.stock !== undefined) updateData.stock = data.stock;
-        if (data.images) updateData.images = data.images;
-        if (data.colors) updateData.colors = data.colors;
-        if (data.categoryId !== undefined) updateData.categoryId = data.categoryId ? parseInt(data.categoryId) : null;
+            // 2. Update data dasar produk
+            const updateData: any = {};
+            if (data.sku) updateData.sku = data.sku;
+            if (data.title) updateData.title = data.title;
+            if (data.description !== undefined) updateData.description = data.description;
+            if (data.price !== undefined) updateData.price = parseInt(data.price) || 0;
+            if (data.stock !== undefined) updateData.stock = parseInt(data.stock) || 0;
+            if (data.images) updateData.images = data.images;
+            if (data.colors) updateData.colors = data.colors;
+            if (categoryId !== undefined) updateData.categoryId = categoryId;
 
-        const product = await prisma.product.update({
-            where: {
-                id: parseInt(id)
-            },
-            data: updateData
+            const updatedProduct = await tx.product.update({
+                where: { id: productId },
+                data: updateData
+            });
+
+            // 3. Update Varian Ukuran (Hapus yang lama, buat yang baru)
+            if (data.sizes && Array.isArray(data.sizes)) {
+                // Hapus relasi lama
+                await tx.productSize.deleteMany({
+                    where: { productId: productId }
+                });
+
+                // Cari ID dari ukuran baru
+                const sizeRecords = await tx.size.findMany({
+                    where: { value: { in: data.sizes } }
+                });
+
+                // Buat relasi baru
+                for (const s of sizeRecords) {
+                    await tx.productSize.create({
+                        data: {
+                            productId: productId,
+                            sizeId: s.id,
+                            available: "true"
+                        }
+                    });
+                }
+            }
+
+            return updatedProduct;
         });
 
-        return NextResponse.json(product);
-    } catch (error) {
+        return NextResponse.json(result);
+    } catch (error: any) {
         console.error("Error updating product:", error);
-        return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+        return NextResponse.json({ 
+            error: "Failed to update product",
+            message: error.message
+        }, { status: 500 });
     }
 }
 

@@ -5,13 +5,38 @@ import gsap from "gsap";
 import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import ButtonDark from "@/components/ButtonDark";
+import FormInput from "@/components/FormInput";
 
 export default function AddProductPage() {
     const containerRef = useRef(null);
     const router = useRouter();
-
-    const [sizes, setSizes] = useState<string[]>(['S', 'M', 'L', 'XL']);
+    const [productName, setProductName] = useState('');
+    const [productDescription, setProductDescription] = useState('');
+    const [productPrice, setProductPrice] = useState('');
+    const [productStock, setProductStock] = useState('');
+    const [productImage, setProductImage] = useState('');
+    const [productSizes, setProductSizes] = useState<string[]>(['S', 'M', 'L', 'XL']);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+
+    const handleProductNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProductName(e.target.value);
+    };
+
+    const handleProductDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProductDescription(e.target.value);
+    };
+
+    const handleProductPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProductPrice(e.target.value);
+    };
+
+    const handleProductStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProductStock(e.target.value);
+    };
+
+    const handleProductImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProductImage(e.target.value);
+    };
 
     const toggleSize = (size: string) => {
         if (selectedSizes.includes(size)) {
@@ -62,29 +87,32 @@ export default function AddProductPage() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    
+
                     {/* Main Form Area */}
                     <div className="lg:col-span-2 space-y-10">
-                        
+
                         {/* Basic Info */}
                         <div className="form-section bg-white p-10 border border-gray-100 hover:border-black transition-all">
                             <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8 pb-4 border-b-4 border-black">Informasi Umum</h2>
-                            
+
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Nama Produk</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="CONTOH: ADICOLOR CLASSICS HOODIE" 
-                                        className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-sm font-black italic uppercase outline-none transition-all"
+                                    <FormInput
+                                        type="text"
+                                        id="productName"
+                                        label="Nama Produk"
+                                        value=""
+                                        onChange={() => { }}
+                                        placeholder="CONTOH: ADICOLOR CLASSICS HOODIE"
+                                        className="!border-2 !border-transparent hover:!border-black focus:!border-black !px-6 !py-4 !text-sm !font-black !italic !uppercase"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Deskripsi</label>
-                                    <textarea 
+                                    <textarea
                                         rows={5}
-                                        placeholder="DESKRIPSIKAN DETAIL MATERIAL, POTONGAN, DAN GAYA PRODUK..." 
+                                        placeholder="DESKRIPSIKAN DETAIL MATERIAL, POTONGAN, DAN GAYA PRODUK..."
                                         className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-sm font-bold outline-none transition-all resize-none"
                                     ></textarea>
                                 </div>
@@ -94,10 +122,10 @@ export default function AddProductPage() {
                         {/* Media / Images */}
                         <div className="form-section bg-white p-10 border border-gray-100 hover:border-black transition-all">
                             <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8 pb-4 border-b-4 border-black">Media Produk</h2>
-                            
+
                             <div className="border-2 border-dashed border-gray-300 hover:border-black p-12 flex flex-col items-center justify-center cursor-pointer transition-all bg-gray-50 group">
                                 <div className="w-16 h-16 bg-white border-2 border-black flex items-center justify-center mb-4 group-hover:-translate-y-2 transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
                                 </div>
                                 <span className="text-sm font-black uppercase italic tracking-widest text-black">Klik atau Tarik Gambar</span>
                                 <span className="text-[10px] font-bold text-gray-400 mt-2 tracking-[0.1em] uppercase">PNG, JPG, WEBP (MAX. 5MB)</span>
@@ -108,39 +136,39 @@ export default function AddProductPage() {
 
                     {/* Sidebar Area */}
                     <div className="space-y-10">
-                        
+
                         {/* Pricing & Stock */}
                         <div className="form-section bg-white p-10 border border-gray-100 hover:border-black transition-all">
                             <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8 pb-4 border-b-4 border-black">Harga & Stok</h2>
-                            
+
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Harga (USD)</label>
                                     <div className="relative">
-                                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-sm font-black italic">$</span>
-                                        <input 
-                                            type="number" 
-                                            placeholder="0.00" 
-                                            className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black pl-10 pr-6 py-4 text-sm font-black italic outline-none transition-all"
+                                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-sm font-black italic z-10">$</span>
+                                        <FormInput
+                                            type="number"
+                                            placeholder="0.00"
+                                            className="!border-2 !border-transparent hover:!border-black focus:!border-black !pl-10 !pr-6 !py-4 !text-sm !font-black !italic"
                                         />
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Kuantitas Stok</label>
-                                    <input 
-                                        type="number" 
-                                        placeholder="0" 
-                                        className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-sm font-black italic outline-none transition-all"
+                                    <FormInput
+                                        type="number"
+                                        placeholder="0"
+                                        className="!border-2 !border-transparent hover:!border-black focus:!border-black !px-6 !py-4 !text-sm !font-black !italic"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">SKU (Opsional)</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="CONTOH: FTR-092-BLK" 
-                                        className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-sm font-black italic uppercase outline-none transition-all"
+                                    <FormInput
+                                        type="text"
+                                        placeholder="CONTOH: FTR-092-BLK"
+                                        className="!border-2 !border-transparent hover:!border-black focus:!border-black !px-6 !py-4 !text-sm !font-black !italic !uppercase"
                                     />
                                 </div>
                             </div>
@@ -149,7 +177,7 @@ export default function AddProductPage() {
                         {/* Variants */}
                         <div className="form-section bg-white p-10 border border-gray-100 hover:border-black transition-all">
                             <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8 pb-4 border-b-4 border-black">Varian</h2>
-                            
+
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Kategori</label>
@@ -163,15 +191,14 @@ export default function AddProductPage() {
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Ukuran Tersedia</label>
                                     <div className="flex flex-wrap gap-3">
-                                        {sizes.map((size) => (
-                                            <button 
+                                        {productSizes.map((size) => (
+                                            <button
                                                 key={size}
                                                 onClick={() => toggleSize(size)}
-                                                className={`w-12 h-12 flex items-center justify-center border-2 font-black italic text-sm transition-all ${
-                                                    selectedSizes.includes(size) 
-                                                    ? 'bg-black text-white border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' 
+                                                className={`w-12 h-12 flex items-center justify-center border-2 font-black italic text-sm transition-all ${selectedSizes.includes(size)
+                                                    ? 'bg-black text-white border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
                                                     : 'bg-white text-gray-400 border-gray-200 hover:border-black hover:text-black'
-                                                }`}
+                                                    }`}
                                             >
                                                 {size}
                                             </button>

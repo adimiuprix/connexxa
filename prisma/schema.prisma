@@ -19,6 +19,7 @@ model User {
     carts     Cart[]
     reviews   Review[]
     wishlists Wishlist[]
+    orders    Order[]
 }
 
 model Category {
@@ -37,6 +38,7 @@ model Product {
     price       Int           @default(0)
     stock       Int           @default(0)
     images      String[]      @default([])
+    colors      String[]
     createdAt   DateTime      @default(now())
     updatedAt   DateTime      @updatedAt
     sizes       ProductSize[]
@@ -44,6 +46,7 @@ model Product {
     wishlists   Wishlist[]
     category    Category?     @relation(fields: [categoryId], references: [id])
     categoryId  Int?
+    orders      Order[]
 }
 
 model Size {
@@ -119,4 +122,19 @@ model Wishlist {
 enum Availability {
     true
     false
+}
+
+model Order {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    productId Int
+    size      String
+    color     String
+    price     Int
+    quantity  Int      @default(1)
+    image     String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

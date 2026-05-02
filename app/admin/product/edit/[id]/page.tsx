@@ -8,6 +8,7 @@ import ButtonDark from "@/components/ButtonDark";
 import FormInput from "@/components/FormInput";
 import MediaUpload from "@/components/MediaUpload";
 
+
 export default function EditProductPage() {
     const containerRef = useRef(null);
     const router = useRouter();
@@ -62,10 +63,27 @@ export default function EditProductPage() {
 
     const handleUpdate = async () => {
         try {
-            // Log untuk menghindari warning unused variable dan untuk debugging
+            // 1. Upload Gambar BARU ke Supabase via API Route
+            let newImageUrls: string[] = [];
             if (productImage.length > 0) {
-                console.log(`${productImage.length} gambar baru siap diunggah (implementasi Upload di langkah berikutnya)`);
+                const uploadPromises = productImage.map(async (file) => {
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    const res = await fetch('/api/admin/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!res.ok) throw new Error("Gagal mengunggah gambar");
+                    const data = await res.json();
+                    return data.url;
+                });
+                newImageUrls = await Promise.all(uploadPromises);
             }
+
+            // 2. Gabungkan gambar lama (yang tidak dihapus) dengan gambar baru
+            const combinedImages = [...existingImages, ...newImageUrls];
 
             const response = await fetch(`/api/admin/product?id=${productId}`, {
                 method: 'PUT',
@@ -81,7 +99,7 @@ export default function EditProductPage() {
                     categorySlug: productCategory,
                     colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
                     sizes: selectedSizes,
-                    images: existingImages, // Saat ini hanya mengirim URL gambar lama yang tersisa
+                    images: combinedImages, 
                 }),
             });
 

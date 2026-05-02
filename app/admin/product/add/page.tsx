@@ -8,6 +8,7 @@ import ButtonDark from "@/components/ButtonDark";
 import FormInput from "@/components/FormInput";
 import MediaUpload from "@/components/MediaUpload";
 
+
 export default function AddProductPage() {
     const containerRef = useRef(null);
     const router = useRouter();
@@ -73,40 +74,65 @@ export default function AddProductPage() {
     }, { scope: containerRef });
 
     const handleAddProduct = async () => {
-        // kirim ke api /api/admin/product
-        const response = await fetch('/api/admin/product', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title: productName,
-                description: productDescription,
-                price: productPrice,
-                stock: productStock,
-                sku: productSku,
-                categorySlug: productCategory,
-                colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
-                sizes: selectedSizes,
-                images: [], 
-            }),
-        });
-        const data = await response.json();
-        if (response.ok) {
-            router.push('/admin/product');
-            // Reset form
-            setProductName('');
-            setProductDescription('');
-            setProductPrice('');
-            setProductStock('');
-            setProductSku('');
-            setProductCategory('footwear');
-            setProductColors('');
-            setSelectedSizes([]);
-            setProductImage([]);
-        } else {
-            console.error("API Error:", data);
-            alert(`Gagal menyimpan produk: ${data.message || data.error || 'Terjadi kesalahan server'}`);
+        try {
+            // 1. Upload Gambar ke Supabase via API Route
+            let uploadedImageUrls: string[] = [];
+            if (productImage.length > 0) {
+                const uploadPromises = productImage.map(async (file) => {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    
+                    const res = await fetch('/api/admin/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!res.ok) throw new Error("Gagal mengunggah gambar");
+                    const data = await res.json();
+                    return data.url;
+                });
+                uploadedImageUrls = await Promise.all(uploadPromises);
+            }
+
+            // 2. Kirim data ke API
+            const response = await fetch('/api/admin/product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: productName,
+                    description: productDescription,
+                    price: productPrice,
+                    stock: productStock,
+                    sku: productSku,
+                    categorySlug: productCategory,
+                    colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
+                    sizes: selectedSizes,
+                    images: uploadedImageUrls, 
+                }),
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+                router.push('/admin/product');
+                // Reset form
+                setProductName('');
+                setProductDescription('');
+                setProductPrice('');
+                setProductStock('');
+                setProductSku('');
+                setProductCategory('footwear');
+                setProductColors('');
+                setSelectedSizes([]);
+                setProductImage([]);
+            } else {
+                console.error("API Error:", data);
+                alert(`Gagal menyimpan produk: ${data.message || data.error || 'Terjadi kesalahan server'}`);
+            }
+        } catch (error: any) {
+            console.error("Error adding product:", error);
+            alert(`Error: ${error.message}`);
         }
     };
 

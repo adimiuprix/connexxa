@@ -5,6 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import CheckroomOutlinedIcon from '@mui/icons-material/CheckroomOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
+import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -57,12 +63,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }, [isMobileMenuOpen]);
 
     const navItems = [
-        { name: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
-        { name: 'Produk', path: '/admin/product', icon: '👕' },
-        { name: 'Pesanan', path: '/admin/orders', icon: '📦' },
-        { name: 'Pelanggan', path: '/admin/customers', icon: '👥' },
-        { name: 'Promosi', path: '/admin/promotions', icon: '🏷️' },
-        { name: 'Pengaturan', path: '/admin/settings', icon: '⚙️' },
+        { name: 'Dashboard', path: '/admin/dashboard', icon: <DashboardOutlinedIcon sx={{ fontSize: 20 }} /> },
+        { name: 'Produk', path: '/admin/product', icon: <CheckroomOutlinedIcon sx={{ fontSize: 20 }} /> },
+        { name: 'Pesanan', path: '/admin/orders', icon: <LocalShippingOutlinedIcon sx={{ fontSize: 20 }} /> },
+        { name: 'Pelanggan', path: '/admin/customers', icon: <PeopleOutlinedIcon sx={{ fontSize: 20 }} /> },
+        { name: 'Promosi', path: '/admin/promotions', icon: <LocalOfferOutlinedIcon sx={{ fontSize: 20 }} /> },
+        { name: 'Pengaturan', path: '/admin/settings', icon: <SettingsOutlinedIcon sx={{ fontSize: 20 }} /> },
     ];
 
     return (

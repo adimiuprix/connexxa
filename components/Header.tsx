@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Menu from './Menu';
 import Modal from './Modal';
 import FormInput from './FormInput';
@@ -44,6 +44,10 @@ interface CartSnapshot {
 
 const Header = () => {
     const router = useRouter();
+    const pathname = usePathname();
+
+    if (pathname?.startsWith('/admin')) return null;
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'login' | 'register'>('login');

@@ -46,6 +46,7 @@ export default function Home() {
         }).format(product.price),
         image: product.images[0] || '/placeholder.jpg',
         hoverImage: product.images[1] || null,
+        isWishlisted: (product as any).isWishlisted || false,
     }));
 
     return (
@@ -60,7 +61,7 @@ export default function Home() {
                     </h2>
                     <div className="flex space-x-4 overflow-x-auto pb-8 scrollbar-hide">
                         {productsData.map(product => (
-                            <ProductBox key={product.id} product={product} />
+                            <ProductBox key={product.id} product={product} active={product.isWishlisted} />
                         ))}
                     </div>
                 </div>

@@ -6,9 +6,44 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
-const ProductBox = ({ product }: { product: any }) => {
+const ProductBox = ({ product, active: initialActive = false }: { product: any; active?: boolean }) => {
+    const [isActive, setIsActive] = React.useState(initialActive);
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsActive(initialActive);
+    }, [initialActive]);
     const containerRef = useRef<HTMLAnchorElement>(null);
     const { contextSafe } = useGSAP({ scope: containerRef });
+
+    const handleToggleWishlist = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isLoading) return;
+
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/wishlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: product.id }),
+            });
+
+            if (response.ok) {
+                setIsActive(!isActive);
+            } else {
+                const data = await response.json();
+                if (data.error && data.error.includes('login')) {
+                    alert('Silakan login terlebih dahulu untuk menyimpan ke Wishlist');
+                }
+            }
+        } catch (error) {
+            console.error('Wishlist error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useGSAP(() => {
         // Set awal untuk numpuk
@@ -98,11 +133,16 @@ const ProductBox = ({ product }: { product: any }) => {
                         className="object-cover hover-img"
                     />
                 )}
-                <div className="absolute top-2 right-2 bg-white p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black">
+                
+                <button 
+                    onClick={handleToggleWishlist}
+                    disabled={isLoading}
+                    className={`absolute top-2 right-2 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10 ${isActive ? 'bg-black text-white' : 'bg-white text-black'} hover:scale-110 active:scale-95 transition-transform`}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill={isActive ? "white" : "none"} stroke={isActive ? "white" : "black"}>
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
-                </div>
+                </button>
             </div>
             <div className="mt-4 space-y-1">
                 <h3 className="text-sm font-semibold uppercase tracking-tight text-black">{product.name}</h3>

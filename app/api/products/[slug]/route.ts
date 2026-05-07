@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
+import { createClient } from "@/libs/supabaseServer";
 
 export async function GET(
     request: Request,
@@ -7,6 +8,9 @@ export async function GET(
 ) {
     try {
         const { slug } = await params;
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
         const product = await prisma.product.findUnique({
             where: {
                 slug: slug,
@@ -25,9 +29,23 @@ export async function GET(
             return NextResponse.json({ error: "Product not found" }, { status: 404 });
         }
 
+        let isWishlisted = false;
+        if (user) {
+            const wishlistEntry = await prisma.wishlist.findUnique({
+                where: {
+                    userId_productId: {
+                        userId: user.id,
+                        productId: product.id,
+                    },
+                },
+            });
+            isWishlisted = !!wishlistEntry;
+        }
+
         const responseData = {
             ...product,
             tot_review: product.reviews?.length || 0,
+            isWishlisted: isWishlisted,
         };
 
         return NextResponse.json(responseData);

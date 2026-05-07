@@ -32,6 +32,7 @@ const Page = () => {
     const [showDelivery, setShowDelivery] = useState(false);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [cartMessage, setCartMessage] = useState('');
+    const [isWishlisted, setIsWishlisted] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -40,6 +41,7 @@ const Page = () => {
                 const data = await response.json();
                 if (response.ok) {
                     setProduct(data);
+                    setIsWishlisted(data.isWishlisted);
                 }
             } catch (error) {
                 console.error('Failed to fetch product:', error);
@@ -90,6 +92,7 @@ const Page = () => {
             if (response.ok) {
                 const icon = data.action === 'added' ? '✅' : '🗑️';
                 setCartMessage(`${icon} ${data.message}`);
+                setIsWishlisted(data.action === 'added');
             } else {
                 setCartMessage(`❌ ${data.error || 'Gagal memproses wishlist'}`);
             }
@@ -249,8 +252,11 @@ const Page = () => {
                                 priority
                             />
                             {/* Wishlist button on image */}
-                            <button className="absolute top-4 right-4 w-10 h-10 bg-white flex items-center justify-center hover:bg-black hover:text-white transition-all duration-200">
-                                <FavoriteBorderIcon sx={{ fontSize: 20 }} />
+                            <button 
+                                onClick={handleAddToWishlist}
+                                className={`absolute top-4 right-4 w-10 h-10 flex items-center justify-center transition-all duration-200 ${isWishlisted ? 'bg-black text-white' : 'bg-white text-black'} hover:scale-110 active:scale-95 shadow-md`}
+                            >
+                                <FavoriteBorderIcon sx={{ fontSize: 20, color: isWishlisted ? 'white' : 'black' }} />
                             </button>
                         </div>
                     </div>
@@ -338,9 +344,12 @@ const Page = () => {
                             </p>
                         )}
 
-                        <button onClick={handleAddToWishlist} className="w-full h-[52px] bg-white text-black border border-black font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 hover:bg-black hover:text-white transition-all duration-200">
-                            <FavoriteBorderIcon sx={{ fontSize: 18 }} />
-                            <span>Simpan ke Wishlist</span>
+                        <button 
+                            onClick={handleAddToWishlist} 
+                            className={`w-full h-[52px] font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 transition-all duration-200 border border-black ${isWishlisted ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'}`}
+                        >
+                            <FavoriteBorderIcon sx={{ fontSize: 18, color: isWishlisted ? 'white' : 'inherit' }} />
+                            <span>{isWishlisted ? 'Hapus dari Wishlist' : 'Simpan ke Wishlist'}</span>
                         </button>
                     </div>
 

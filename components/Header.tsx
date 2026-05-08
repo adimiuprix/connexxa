@@ -448,6 +448,8 @@ const Header = () => {
                             className="relative"
                             onMouseEnter={handleCartPreviewOpen}
                             onMouseLeave={handleCartPreviewClose}
+                            onClick={() => router.push('/cart')}
+                            style={{ cursor: 'pointer' }}
                         >
                             <div className="relative p-1 hover:bg-gray-100 rounded-sm transition-colors cursor-pointer">
                                 <ShoppingBagOutlinedIcon sx={{ fontSize: 24 }} />

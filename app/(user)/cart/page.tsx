@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ButtonDark from '@/components/ButtonDark';
@@ -9,34 +9,83 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
+import { CART_SESSION_KEY, dispatchCartSync } from '@/libs/cartSync';
+
+interface CartItem {
+    id: number;
+    productId: string;
+    title: string;
+    size: string;
+    color: string;
+    price: number;
+    quantity: number;
+    image: string | null;
+}
 
 export default function CartPage() {
-    // Dummy data for demonstration
-    const cartItems = [
-        {
-            id: 1,
-            title: "Track Top Away Argentina 2006",
-            color: "Dark Blue",
-            size: "S",
-            price: 1600000,
-            quantity: 1,
-            image: "/stack.jpg",
-            stockStatus: "Persediaan sedikit"
-        },
-        {
-            id: 2,
-            title: "Samba OG Shoes",
-            color: "Cloud White / Core Black",
-            size: "42",
-            price: 1800000,
-            quantity: 1,
-            image: "/Samba_OG_Shoes_White_B75806_01_standard.jpg",
-            stockStatus: ""
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [removingItemId, setRemovingItemId] = useState<number | null>(null);
+
+    const fetchCart = useCallback(async () => {
+        const sessionId = localStorage.getItem(CART_SESSION_KEY);
+        if (!sessionId) {
+            setCartItems([]);
+            setTotalPrice(0);
+            setIsLoading(false);
+            return;
         }
-    ];
+
+        try {
+            const response = await fetch(`/api/cart?sessionId=${encodeURIComponent(sessionId)}`);
+            if (response.ok) {
+                const data = await response.json();
+                setCartItems(data.items || []);
+                setTotalPrice(data.totalPrice || 0);
+            }
+        } catch (error) {
+            console.error("Gagal mengambil data cart:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchCart();
+    }, [fetchCart]);
+
+    const handleRemoveItem = async (itemId: number) => {
+        const sessionId = localStorage.getItem(CART_SESSION_KEY);
+        if (!sessionId || removingItemId) return;
+
+        setRemovingItemId(itemId);
+        try {
+            const response = await fetch('/api/cart', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, itemId }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCartItems(data.items || []);
+                setTotalPrice(data.totalPrice || 0);
+                
+                // Sinkronkan ke Header
+                dispatchCartSync({
+                    sessionId,
+                    totalItems: data.totalItems,
+                });
+            }
+        } catch (error) {
+            console.error("Gagal menghapus item:", error);
+        } finally {
+            setRemovingItemId(null);
+        }
+    };
 
     const formatCurrency = (amount: number) => {
-        // Precise format: Rp.1.600.000,00
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -44,7 +93,32 @@ export default function CartPage() {
         }).format(amount).replace(/\s/g, '').replace('Rp', 'Rp.');
     };
 
-    const totalAmount = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    if (isLoading) {
+        return (
+            <div className="bg-white min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-[13px] font-black uppercase tracking-widest italic">Memuat Tas Belanja...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (cartItems.length === 0) {
+        return (
+            <div className="bg-white min-h-screen">
+                <div className="max-w-[1920px] mx-auto px-4 lg:px-10 py-20 text-center">
+                    <h1 className="text-4xl lg:text-6xl font-black italic tracking-tighter uppercase mb-6">TAS KAMU KOSONG</h1>
+                    <p className="text-sm text-gray-600 mb-10 max-w-md mx-auto leading-relaxed">
+                        Sepertinya Anda belum menambahkan produk apapun ke tas. Mulai belanja sekarang untuk menemukan koleksi terbaik kami.
+                    </p>
+                    <Link href="/">
+                        <ButtonDark text="Mulai Belanja" icon={<TrendingFlatIcon />} className="mx-auto h-[60px]" />
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white min-h-screen">
@@ -65,11 +139,11 @@ export default function CartPage() {
                     <div className="flex-grow lg:w-[65%]">
                         <div className="space-y-6">
                             {cartItems.map((item) => (
-                                <div key={item.id} className="border border-gray-200 flex flex-col sm:flex-row h-auto sm:h-[260px] group hover:border-black transition-colors">
+                                <div key={item.id} className={`border border-gray-200 flex flex-col sm:flex-row h-auto sm:h-[260px] group hover:border-black transition-all ${removingItemId === item.id ? 'opacity-50 grayscale scale-[0.98]' : ''}`}>
                                     {/* Product Image */}
                                     <div className="w-full sm:w-[260px] h-[260px] bg-[#ebedee] relative flex-shrink-0">
                                         <Image
-                                            src={item.image}
+                                            src={item.image || '/stack.jpg'}
                                             alt={item.title}
                                             fill
                                             className="object-cover"
@@ -86,12 +160,13 @@ export default function CartPage() {
                                                 </p>
                                                 <p className="text-[13px] text-gray-600 font-normal">{item.color}</p>
                                                 <p className="text-[13px] text-gray-600 font-normal">Ukuran: {item.size}</p>
-                                                {item.stockStatus && (
-                                                    <p className="text-[13px] font-bold text-[#b07000] mt-2 italic">{item.stockStatus}</p>
-                                                )}
                                             </div>
                                             <div className="flex flex-col gap-5 absolute top-5 right-5 lg:top-7 lg:right-7">
-                                                <button className="text-black hover:text-gray-500 transition-colors cursor-pointer">
+                                                <button 
+                                                    onClick={() => handleRemoveItem(item.id)}
+                                                    disabled={!!removingItemId}
+                                                    className="text-black hover:text-gray-500 transition-colors cursor-pointer disabled:opacity-30"
+                                                >
                                                     <DeleteOutlinedIcon sx={{ fontSize: 24 }} />
                                                 </button>
                                                 <button className="text-black hover:text-gray-500 transition-colors cursor-pointer">
@@ -103,17 +178,20 @@ export default function CartPage() {
                                         {/* Bottom Controls & Price */}
                                         <div className="flex justify-between items-end mt-6">
                                             <div className="relative group/select">
-                                                <select className="appearance-none bg-white border border-black px-4 py-2.5 pr-10 text-[13px] font-bold focus:outline-none cursor-pointer w-[80px] hover:bg-gray-50 transition-colors">
-                                                    <option value="1">1</option>
-                                                    <option value="2">2</option>
-                                                    <option value="3">3</option>
+                                                <select 
+                                                    defaultValue={item.quantity}
+                                                    className="appearance-none bg-white border border-black px-4 py-2.5 pr-10 text-[13px] font-bold focus:outline-none cursor-pointer w-[80px] hover:bg-gray-50 transition-colors"
+                                                >
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                                        <option key={n} value={n}>{n}</option>
+                                                    ))}
                                                 </select>
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-black">
                                                     <KeyboardArrowDownIcon sx={{ fontSize: 22 }} />
                                                 </div>
                                             </div>
                                             <div className="text-base lg:text-[19px] font-bold text-black tracking-tighter">
-                                                {formatCurrency(item.price)}
+                                                {formatCurrency(item.price * item.quantity)}
                                             </div>
                                         </div>
                                     </div>
@@ -126,11 +204,11 @@ export default function CartPage() {
                     <div className="lg:w-[35%] flex flex-col gap-8">
                         <div className="space-y-7">
                             <h2 className="text-2xl lg:text-[26px] font-black italic tracking-tighter uppercase">RINGKASAN PESANAN</h2>
-
+                            
                             <div className="space-y-4">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-black font-medium">{cartItems.length} item</span>
-                                    <span className="text-black font-medium tracking-tight">{formatCurrency(totalAmount)}</span>
+                                    <span className="text-black font-medium">{cartItems.reduce((a, b) => a + b.quantity, 0)} item</span>
+                                    <span className="text-black font-medium tracking-tight">{formatCurrency(totalPrice)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-black font-medium">Pengiriman</span>
@@ -140,7 +218,7 @@ export default function CartPage() {
 
                             <div className="pt-7 border-t border-gray-100 flex justify-between items-baseline">
                                 <span className="text-base font-black uppercase italic tracking-tighter">Total</span>
-                                <span className="text-xl font-black tracking-tighter">{formatCurrency(totalAmount)}</span>
+                                <span className="text-xl font-black tracking-tighter">{formatCurrency(totalPrice)}</span>
                             </div>
 
                             <div className="pt-2">
@@ -168,7 +246,6 @@ export default function CartPage() {
                                 METODE PEMBAYARAN YANG DITERIMA
                             </h4>
                             <div className="flex flex-wrap items-center gap-6 opacity-90">
-                                {/* Placeholders for payment icons with cleaner design */}
                                 <div className="flex items-center gap-1.5 px-2 py-1 border border-black rounded-sm bg-black text-white scale-90">
                                     <span className="text-[10px] font-black italic tracking-tighter">QRIS</span>
                                 </div>
@@ -186,4 +263,5 @@ export default function CartPage() {
         </div>
     );
 }
+
 

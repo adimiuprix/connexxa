@@ -191,3 +191,83 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
+
+// PATCH: Perbarui kuantitas item di cart
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { sessionId, itemId, quantity } = body;
+
+    if (!sessionId || !itemId || quantity === undefined) {
+      return NextResponse.json(
+        { error: "Data tidak lengkap. Diperlukan: sessionId, itemId, dan quantity" },
+        { status: 400 }
+      );
+    }
+
+    if (quantity < 1) {
+      return NextResponse.json(
+        { error: "Kuantitas harus minimal 1" },
+        { status: 400 }
+      );
+    }
+
+    const cart = await prisma.cart.findUnique({
+      where: { sessionId },
+      select: { id: true },
+    });
+
+    if (!cart) {
+      return NextResponse.json(
+        { error: "Cart tidak ditemukan" },
+        { status: 404 }
+      );
+    }
+
+    const cartItem = await prisma.cartItem.findFirst({
+      where: {
+        id: Number(itemId),
+        cartId: cart.id,
+      },
+    });
+
+    if (!cartItem) {
+      return NextResponse.json(
+        { error: "Item cart tidak ditemukan" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.cartItem.update({
+      where: { id: cartItem.id },
+      data: { quantity: Number(quantity) },
+    });
+
+    const updatedCart = await prisma.cart.findUnique({
+      where: { id: cart.id },
+      include: {
+        items: {
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
+
+    const items = updatedCart?.items || [];
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    return NextResponse.json({
+      message: "Kuantitas diperbarui",
+      items,
+      totalItems,
+      totalPrice,
+    });
+  } catch (error) {
+    console.error("Error updating cart item quantity:", error);
+    return NextResponse.json(
+      { error: "Gagal memperbarui kuantitas" },
+      { status: 500 }
+    );
+  }
+}
+

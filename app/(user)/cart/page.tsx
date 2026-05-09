@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ButtonDark from '@/components/ButtonDark';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
@@ -27,6 +26,7 @@ export default function CartPage() {
     const [totalPrice, setTotalPrice] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [removingItemId, setRemovingItemId] = useState<number | null>(null);
+    const [updatingItemId, setUpdatingItemId] = useState<number | null>(null);
 
     const fetchCart = useCallback(async () => {
         const sessionId = localStorage.getItem(CART_SESSION_KEY);
@@ -85,6 +85,38 @@ export default function CartPage() {
         }
     };
 
+    const handleUpdateQuantity = async (itemId: number, newQuantity: number) => {
+        const sessionId = localStorage.getItem(CART_SESSION_KEY);
+        if (!sessionId || updatingItemId) return;
+
+        setUpdatingItemId(itemId);
+        try {
+            const response = await fetch('/api/cart', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, itemId, quantity: newQuantity }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCartItems(data.items || []);
+                setTotalPrice(data.totalPrice || 0);
+                
+                // Sinkronkan ke Header
+                dispatchCartSync({
+                    sessionId,
+                    totalItems: data.totalItems,
+                });
+            }
+        } catch (error) {
+            console.error("Gagal memperbarui kuantitas:", error);
+        } finally {
+            // Berikan sedikit delay untuk feel yang lebih smooth
+            setTimeout(() => setUpdatingItemId(null), 300);
+        }
+    };
+
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -139,7 +171,16 @@ export default function CartPage() {
                     <div className="flex-grow lg:w-[65%]">
                         <div className="space-y-6">
                             {cartItems.map((item) => (
-                                <div key={item.id} className={`border border-gray-200 flex flex-col sm:flex-row h-auto sm:h-[260px] group hover:border-black transition-all ${removingItemId === item.id ? 'opacity-50 grayscale scale-[0.98]' : ''}`}>
+                                <div key={item.id} className={`border border-gray-200 flex flex-col sm:flex-row h-auto sm:h-[260px] group hover:border-black transition-all duration-500 relative overflow-hidden ${removingItemId === item.id ? 'opacity-50 grayscale scale-[0.98]' : ''} ${updatingItemId === item.id ? 'border-black' : ''}`}>
+                                    {/* Sophisticated Loading Overlay */}
+                                    {updatingItemId === item.id && (
+                                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center animate-in fade-in duration-300">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                                                <span className="text-[10px] font-black uppercase tracking-widest italic">Updating...</span>
+                                            </div>
+                                        </div>
+                                    )}
                                     {/* Product Image */}
                                     <div className="w-full sm:w-[260px] h-[260px] bg-[#ebedee] relative flex-shrink-0">
                                         <Image
@@ -169,9 +210,6 @@ export default function CartPage() {
                                                 >
                                                     <DeleteOutlinedIcon sx={{ fontSize: 24 }} />
                                                 </button>
-                                                <button className="text-black hover:text-gray-500 transition-colors cursor-pointer">
-                                                    <FavoriteBorderIcon sx={{ fontSize: 24 }} />
-                                                </button>
                                             </div>
                                         </div>
 
@@ -179,18 +217,20 @@ export default function CartPage() {
                                         <div className="flex justify-between items-end mt-6">
                                             <div className="relative group/select">
                                                 <select 
-                                                    defaultValue={item.quantity}
-                                                    className="appearance-none bg-white border border-black px-4 py-2.5 pr-10 text-[13px] font-bold focus:outline-none cursor-pointer w-[80px] hover:bg-gray-50 transition-colors"
+                                                    value={item.quantity}
+                                                    onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value))}
+                                                    disabled={!!updatingItemId || !!removingItemId}
+                                                    className="appearance-none bg-white border border-black px-4 py-2.5 pr-10 text-[13px] font-bold focus:outline-none cursor-pointer w-[80px] hover:bg-black hover:text-white transition-all duration-300 disabled:opacity-50"
                                                 >
                                                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                                        <option key={n} value={n}>{n}</option>
+                                                        <option key={n} value={n} className="text-black bg-white">{n}</option>
                                                     ))}
                                                 </select>
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-black">
                                                     <KeyboardArrowDownIcon sx={{ fontSize: 22 }} />
                                                 </div>
                                             </div>
-                                            <div className="text-base lg:text-[19px] font-bold text-black tracking-tighter">
+                                            <div className={`text-base lg:text-[19px] font-bold text-black tracking-tighter transition-all duration-300 ${updatingItemId === item.id ? 'opacity-30 scale-95 blur-[1px]' : 'opacity-100 scale-100 blur-0'}`}>
                                                 {formatCurrency(item.price * item.quantity)}
                                             </div>
                                         </div>
@@ -218,7 +258,9 @@ export default function CartPage() {
 
                             <div className="pt-7 border-t border-gray-100 flex justify-between items-baseline">
                                 <span className="text-base font-black uppercase italic tracking-tighter">Total</span>
-                                <span className="text-xl font-black tracking-tighter">{formatCurrency(totalPrice)}</span>
+                                <span className={`text-xl font-black tracking-tighter transition-all duration-500 ${updatingItemId ? 'scale-110 text-gray-500' : 'scale-100 text-black'}`}>
+                                    {formatCurrency(totalPrice)}
+                                </span>
                             </div>
 
                             <div className="pt-2">

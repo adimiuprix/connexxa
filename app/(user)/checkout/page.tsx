@@ -79,7 +79,7 @@ const CheckoutPage = () => {
             duration: 0.8,
             ease: 'power3.out'
         });
-        
+
         gsap.from('.stagger-item', {
             opacity: 0,
             x: -20,
@@ -129,59 +129,59 @@ const CheckoutPage = () => {
                             <div className="bg-black text-white w-8 h-8 flex items-center justify-center font-black italic">1</div>
                             <h2 className="text-xl font-black italic uppercase tracking-tight">Informasi Pengiriman</h2>
                         </div>
-                        
+
                         <div className="space-y-4">
-                            <FormInput 
-                                label="Alamat Email" 
-                                placeholder="nama@email.com" 
+                            <FormInput
+                                label="Alamat Email"
+                                placeholder="nama@email.com"
                                 type="email"
                                 value={formData.email}
-                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormInput 
-                                    label="Nama Depan" 
-                                    placeholder="Masukkan nama depan" 
+                                <FormInput
+                                    label="Nama Depan"
+                                    placeholder="Masukkan nama depan"
                                     value={formData.firstName}
-                                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                 />
-                                <FormInput 
-                                    label="Nama Belakang" 
-                                    placeholder="Masukkan nama belakang" 
+                                <FormInput
+                                    label="Nama Belakang"
+                                    placeholder="Masukkan nama belakang"
                                     value={formData.lastName}
-                                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                 />
                             </div>
 
-                            <FormInput 
-                                label="Alamat Lengkap" 
-                                placeholder="Jalan, Nomor Rumah, Apartemen, dsb." 
+                            <FormInput
+                                label="Alamat Lengkap"
+                                placeholder="Jalan, Nomor Rumah, Apartemen, dsb."
                                 value={formData.address}
-                                onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             />
 
                             <div className="grid grid-cols-2 gap-4">
-                                <FormInput 
-                                    label="Kota" 
-                                    placeholder="Contoh: Jakarta" 
+                                <FormInput
+                                    label="Kota"
+                                    placeholder="Contoh: Jakarta"
                                     value={formData.city}
-                                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                                 />
-                                <FormInput 
-                                    label="Kode Pos" 
-                                    placeholder="12345" 
+                                <FormInput
+                                    label="Kode Pos"
+                                    placeholder="12345"
                                     value={formData.postalCode}
-                                    onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                                 />
                             </div>
 
-                            <FormInput 
-                                label="Nomor Telepon" 
-                                placeholder="0812xxxxxxx" 
+                            <FormInput
+                                label="Nomor Telepon"
+                                placeholder="0812xxxxxxx"
                                 type="tel"
                                 value={formData.phone}
-                                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             />
                         </div>
                     </section>
@@ -194,7 +194,7 @@ const CheckoutPage = () => {
                         </div>
 
                         <div className="grid grid-cols-1 gap-4">
-                            <PaymentOption 
+                            <PaymentOption
                                 id="va"
                                 title="Virtual Account (Transfer Bank)"
                                 description="BCA, Mandiri, BNI, BRI"
@@ -202,7 +202,7 @@ const CheckoutPage = () => {
                                 onSelect={setPaymentMethod}
                                 icon={<AccountBalanceOutlinedIcon />}
                             />
-                            <PaymentOption 
+                            <PaymentOption
                                 id="cc"
                                 title="Kartu Kredit / Debit"
                                 description="Visa, Mastercard, JCB"
@@ -210,7 +210,7 @@ const CheckoutPage = () => {
                                 onSelect={setPaymentMethod}
                                 icon={<CreditCardOutlinedIcon />}
                             />
-                            <PaymentOption 
+                            <PaymentOption
                                 id="wallet"
                                 title="E-Wallet"
                                 description="GoPay, OVO, Dana, ShopeePay"
@@ -225,11 +225,11 @@ const CheckoutPage = () => {
                         <p className="text-[11px] text-gray-500 mb-6 leading-relaxed">
                             Dengan mengklik 'Bayar Sekarang', Anda menyetujui <Link href="/terms" className="underline hover:text-black">Syarat dan Ketentuan</Link> serta <Link href="/privacy" className="underline hover:text-black">Kebijakan Privasi</Link> Connexxa. Kami akan memproses pesanan Anda sesuai dengan data yang Anda berikan.
                         </p>
-                        <ButtonDark 
-                            text="Bayar Sekarang" 
-                            fullWidth 
-                            className="py-5 text-[15px]" 
-                            icon={<ChevronRightIcon />} 
+                        <ButtonDark
+                            text="Bayar Sekarang"
+                            fullWidth
+                            className="py-5 text-[15px]"
+                            icon={<ChevronRightIcon />}
                         />
                     </div>
                 </div>
@@ -239,7 +239,7 @@ const CheckoutPage = () => {
                     <div className="sticky top-24 space-y-6">
                         <div className="bg-gray-50 p-6 md:p-8 border border-gray-100">
                             <h2 className="text-xl font-black italic uppercase tracking-tight mb-8">Ringkasan Pesanan</h2>
-                            
+
                             {/* Items List */}
                             <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                 {isLoading ? (
@@ -259,8 +259,8 @@ const CheckoutPage = () => {
                                     cartItems.map((item) => (
                                         <div key={item.id} className="flex gap-4">
                                             <div className="relative w-20 h-24 bg-gray-100 flex-shrink-0">
-                                                <Image 
-                                                    src={item.image || '/placeholder-product.png'} 
+                                                <Image
+                                                    src={item.image || '/placeholder-product.png'}
                                                     alt={item.title}
                                                     fill
                                                     className="object-cover"
@@ -278,7 +278,7 @@ const CheckoutPage = () => {
                                                 </p>
                                                 <div className="flex justify-between items-center mt-2">
                                                     <span className="text-[11px] font-bold">QTY: {item.quantity}</span>
-                                                    <span className="font-bold text-[12px]">{formatPrice(item.price)}</span>
+                                                    <span className="font-bold text-[12px]">{formatPrice(item.price * item.quantity)}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -316,9 +316,9 @@ const CheckoutPage = () => {
                             {/* Promo Code */}
                             <div className="mt-8 pt-6 border-t border-gray-200">
                                 <div className="flex gap-2">
-                                    <input 
-                                        type="text" 
-                                        placeholder="KODE PROMO" 
+                                    <input
+                                        type="text"
+                                        placeholder="KODE PROMO"
                                         className="flex-grow p-3 bg-white border border-gray-200 outline-none focus:border-black text-[12px] font-bold tracking-widest"
                                     />
                                     <button className="px-6 py-3 bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-gray-800 transition-colors">

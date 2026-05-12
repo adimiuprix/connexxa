@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ButtonDark from '@/components/ButtonDark';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
@@ -22,6 +23,7 @@ interface CartItem {
 }
 
 export default function CartPage() {
+    const router = useRouter();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
@@ -278,6 +280,7 @@ export default function CartPage() {
                                     fullWidth
                                     icon={<TrendingFlatIcon sx={{ fontSize: 28 }} />}
                                     className="h-[64px] !text-[15px] !tracking-[0.1em]"
+                                    onClick={() => router.push('/checkout')}
                                 />
                             </div>
                         </div>

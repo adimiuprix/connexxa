@@ -111,6 +111,7 @@ const CheckoutPage = () => {
                 <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-2">
                     Checkout
                 </h1>
+                <br />
                 <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-gray-400">
                     <span className={step >= 1 ? 'text-black underline decoration-2 underline-offset-4' : ''}>Pengiriman</span>
                     <ChevronRightIcon sx={{ fontSize: 16 }} />
@@ -123,14 +124,14 @@ const CheckoutPage = () => {
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
                 {/* Left Column: Forms */}
                 <div className="lg:col-span-7 space-y-12">
-                    {/* Shipping Section */}
-                    <section className="stagger-item">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="bg-black text-white w-8 h-8 flex items-center justify-center font-black italic">1</div>
-                            <h2 className="text-xl font-black italic uppercase tracking-tight">Informasi Pengiriman</h2>
-                        </div>
+                    {step === 1 && (
+                        <section className="stagger-item">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="bg-black text-white w-8 h-8 flex items-center justify-center font-black italic">1</div>
+                                <h2 className="text-xl font-black italic uppercase tracking-tight">Informasi Pengiriman</h2>
+                            </div>
 
-                        <div className="space-y-4">
+                            <div className="space-y-4">
                             <FormInput
                                 label="Alamat Email"
                                 placeholder="nama@email.com"
@@ -184,53 +185,82 @@ const CheckoutPage = () => {
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             />
                         </div>
-                    </section>
+                        </section>
+                    )}
 
-                    {/* Payment Method Section */}
-                    <section className="stagger-item">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="bg-black text-white w-8 h-8 flex items-center justify-center font-black italic">2</div>
-                            <h2 className="text-xl font-black italic uppercase tracking-tight">Metode Pembayaran</h2>
-                        </div>
+                    {step === 2 && (
+                        <section className="stagger-item">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="bg-black text-white w-8 h-8 flex items-center justify-center font-black italic">2</div>
+                                <h2 className="text-xl font-black italic uppercase tracking-tight">Metode Pembayaran</h2>
+                            </div>
 
-                        <div className="grid grid-cols-1 gap-4">
-                            <PaymentOption
-                                id="va"
-                                title="Virtual Account (Transfer Bank)"
-                                description="BCA, Mandiri, BNI, BRI"
-                                isSelected={paymentMethod === 'va'}
-                                onSelect={setPaymentMethod}
-                                icon={<AccountBalanceOutlinedIcon />}
-                            />
-                            <PaymentOption
-                                id="cc"
-                                title="Kartu Kredit / Debit"
-                                description="Visa, Mastercard, JCB"
-                                isSelected={paymentMethod === 'cc'}
-                                onSelect={setPaymentMethod}
-                                icon={<CreditCardOutlinedIcon />}
-                            />
-                            <PaymentOption
-                                id="wallet"
-                                title="E-Wallet"
-                                description="GoPay, OVO, Dana, ShopeePay"
-                                isSelected={paymentMethod === 'wallet'}
-                                onSelect={setPaymentMethod}
-                                icon={<WalletOutlinedIcon />}
-                            />
-                        </div>
-                    </section>
+                            <div className="grid grid-cols-1 gap-4">
+                                <PaymentOption
+                                    id="va"
+                                    title="Virtual Account (Transfer Bank)"
+                                    description="BCA, Mandiri, BNI, BRI"
+                                    isSelected={paymentMethod === 'va'}
+                                    onSelect={setPaymentMethod}
+                                    icon={<AccountBalanceOutlinedIcon />}
+                                />
+                                <PaymentOption
+                                    id="cc"
+                                    title="Kartu Kredit / Debit"
+                                    description="Visa, Mastercard, JCB"
+                                    isSelected={paymentMethod === 'cc'}
+                                    onSelect={setPaymentMethod}
+                                    icon={<CreditCardOutlinedIcon />}
+                                />
+                                <PaymentOption
+                                    id="wallet"
+                                    title="E-Wallet"
+                                    description="GoPay, OVO, Dana, ShopeePay"
+                                    isSelected={paymentMethod === 'wallet'}
+                                    onSelect={setPaymentMethod}
+                                    icon={<WalletOutlinedIcon />}
+                                />
+                            </div>
+                        </section>
+                    )}
 
                     <div className="pt-4 stagger-item">
-                        <p className="text-[11px] text-gray-500 mb-6 leading-relaxed">
-                            Dengan mengklik 'Bayar Sekarang', Anda menyetujui <Link href="/terms" className="underline hover:text-black">Syarat dan Ketentuan</Link> serta <Link href="/privacy" className="underline hover:text-black">Kebijakan Privasi</Link> Connexxa. Kami akan memproses pesanan Anda sesuai dengan data yang Anda berikan.
-                        </p>
-                        <ButtonDark
-                            text="Bayar Sekarang"
-                            fullWidth
-                            className="py-5 text-[15px]"
-                            icon={<ChevronRightIcon />}
-                        />
+                        {step === 1 ? (
+                            <ButtonDark
+                                text="Lanjutkan ke Pembayaran"
+                                fullWidth
+                                className="py-5 text-[15px]"
+                                icon={<ChevronRightIcon />}
+                                onClick={() => setStep(2)}
+                            />
+                        ) : step === 2 ? (
+                            <>
+                                <p className="text-[11px] text-gray-500 mb-6 leading-relaxed">
+                                    Dengan mengklik 'Bayar Sekarang', Anda menyetujui <Link href="/terms" className="underline hover:text-black">Syarat dan Ketentuan</Link> serta <Link href="/privacy" className="underline hover:text-black">Kebijakan Privasi</Link> Connexxa. Kami akan memproses pesanan Anda sesuai dengan data yang Anda berikan.
+                                </p>
+                                <ButtonDark
+                                    text="Bayar Sekarang"
+                                    fullWidth
+                                    className="py-5 text-[15px]"
+                                    icon={<ChevronRightIcon />}
+                                    onClick={() => setStep(3)}
+                                />
+                                <button 
+                                    onClick={() => setStep(1)}
+                                    className="mt-6 text-[11px] font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors block mx-auto underline underline-offset-4"
+                                >
+                                    Kembali ke Pengiriman
+                                </button>
+                            </>
+                        ) : (
+                            <div className="text-center py-10">
+                                <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-4">Pembayaran Berhasil!</h2>
+                                <p className="text-[11px] text-gray-500 uppercase tracking-widest mb-8">Terima kasih telah berbelanja di Connexxa. Nomor pesanan Anda adalah #CNX-{Math.floor(Math.random() * 100000)}</p>
+                                <Link href="/">
+                                    <ButtonDark text="Lanjut Belanja" />
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
 

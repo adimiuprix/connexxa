@@ -15,6 +15,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { CART_SESSION_KEY } from '@/libs/cartSync';
+import PaymentOption from '@/components/PaymentOption';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -193,53 +194,30 @@ const CheckoutPage = () => {
                         </div>
 
                         <div className="grid grid-cols-1 gap-4">
-                            {/* Virtual Account */}
-                            <label 
-                                className={`flex items-center p-5 border-2 cursor-pointer transition-all ${paymentMethod === 'va' ? 'border-black bg-gray-50' : 'border-gray-100 hover:border-gray-300'}`}
-                                onClick={() => setPaymentMethod('va')}
-                            >
-                                <input type="radio" name="payment" className="sr-only" checked={paymentMethod === 'va'} readOnly />
-                                <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${paymentMethod === 'va' ? 'border-black' : 'border-gray-300'}`}>
-                                    {paymentMethod === 'va' && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
-                                </div>
-                                <div className="flex-grow">
-                                    <div className="font-bold text-[13px] uppercase tracking-widest">Virtual Account (Transfer Bank)</div>
-                                    <div className="text-[11px] text-gray-500 uppercase tracking-wider">BCA, Mandiri, BNI, BRI</div>
-                                </div>
-                                <AccountBalanceOutlinedIcon className="text-gray-400" />
-                            </label>
-
-                            {/* Credit Card */}
-                            <label 
-                                className={`flex items-center p-5 border-2 cursor-pointer transition-all ${paymentMethod === 'cc' ? 'border-black bg-gray-50' : 'border-gray-100 hover:border-gray-300'}`}
-                                onClick={() => setPaymentMethod('cc')}
-                            >
-                                <input type="radio" name="payment" className="sr-only" checked={paymentMethod === 'cc'} readOnly />
-                                <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${paymentMethod === 'cc' ? 'border-black' : 'border-gray-300'}`}>
-                                    {paymentMethod === 'cc' && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
-                                </div>
-                                <div className="flex-grow">
-                                    <div className="font-bold text-[13px] uppercase tracking-widest">Kartu Kredit / Debit</div>
-                                    <div className="text-[11px] text-gray-500 uppercase tracking-wider">Visa, Mastercard, JCB</div>
-                                </div>
-                                <CreditCardOutlinedIcon className="text-gray-400" />
-                            </label>
-
-                            {/* E-Wallet */}
-                            <label 
-                                className={`flex items-center p-5 border-2 cursor-pointer transition-all ${paymentMethod === 'wallet' ? 'border-black bg-gray-50' : 'border-gray-100 hover:border-gray-300'}`}
-                                onClick={() => setPaymentMethod('wallet')}
-                            >
-                                <input type="radio" name="payment" className="sr-only" checked={paymentMethod === 'wallet'} readOnly />
-                                <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${paymentMethod === 'wallet' ? 'border-black' : 'border-gray-300'}`}>
-                                    {paymentMethod === 'wallet' && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
-                                </div>
-                                <div className="flex-grow">
-                                    <div className="font-bold text-[13px] uppercase tracking-widest">E-Wallet</div>
-                                    <div className="text-[11px] text-gray-500 uppercase tracking-wider">GoPay, OVO, Dana, ShopeePay</div>
-                                </div>
-                                <WalletOutlinedIcon className="text-gray-400" />
-                            </label>
+                            <PaymentOption 
+                                id="va"
+                                title="Virtual Account (Transfer Bank)"
+                                description="BCA, Mandiri, BNI, BRI"
+                                isSelected={paymentMethod === 'va'}
+                                onSelect={setPaymentMethod}
+                                icon={<AccountBalanceOutlinedIcon />}
+                            />
+                            <PaymentOption 
+                                id="cc"
+                                title="Kartu Kredit / Debit"
+                                description="Visa, Mastercard, JCB"
+                                isSelected={paymentMethod === 'cc'}
+                                onSelect={setPaymentMethod}
+                                icon={<CreditCardOutlinedIcon />}
+                            />
+                            <PaymentOption 
+                                id="wallet"
+                                title="E-Wallet"
+                                description="GoPay, OVO, Dana, ShopeePay"
+                                isSelected={paymentMethod === 'wallet'}
+                                onSelect={setPaymentMethod}
+                                icon={<WalletOutlinedIcon />}
+                            />
                         </div>
                     </section>
 

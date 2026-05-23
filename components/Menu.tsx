@@ -3,11 +3,11 @@ import Link from 'next/link';
 import CloseIcon from '@mui/icons-material/Close';
 
 const menuItems = [
-    { label: 'PRIA', href: '/pria' },
-    { label: 'WANITA', href: '/wanita' },
-    { label: 'ANAK', href: '/anak' },
-    { label: 'SALE', href: '/sale' },
-    { href: "#", label: "COMMING SOON" }
+    { label: 'PRIA', href: '/#' },
+    { label: 'WANITA', href: '/#' },
+    { label: 'ANAK', href: '/#' },
+    { label: 'SALE', href: '/#' },
+    { label: "COMMING SOON", href: "/#" }
 ];
 
 interface MenuProps {

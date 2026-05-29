@@ -15,6 +15,7 @@ import WalletOutlinedIcon from '@mui/icons-material/WalletOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { CART_SESSION_KEY, dispatchCartSync } from '@/libs/cartSync';
 import PaymentOption from '@/components/PaymentOption';
 import { createClient } from '@/libs/supabaseClient';
@@ -245,6 +246,14 @@ const CheckoutPage = () => {
                 totalItems: remainingItems.reduce((sum, item) => sum + item.quantity, 0),
             });
 
+            if (paymentMethod === 'whatsapp') {
+                const adminPhone = '6289635601497'; // Nomor WhatsApp Admin
+                const itemList = cartItems.map(item => `- ${item.quantity}x ${item.title} (${item.size}, ${item.color}) - ${formatPrice(item.price * item.quantity)}`).join('\n');
+                const message = `Halo Admin Connexxa,\n\nSaya ingin mengonfirmasi pesanan dengan metode Manual (WhatsApp).\n\n*Nomor Pesanan:* ${data.orderNumber}\n*Total Tagihan:* ${formatPrice(total)}\n\n*Rincian Pesanan:*\n${itemList}\n\n*Dikirim ke:*\n${formData.firstName} ${formData.lastName}\n${formData.address}, ${formData.city} ${formData.postalCode}\n${formData.phone}\n\nMohon informasi rekening untuk transfer. Terima kasih.`;
+                const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
+                window.open(waUrl, '_blank');
+            }
+
             setStep(3);
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -468,6 +477,14 @@ const CheckoutPage = () => {
                                     isSelected={paymentMethod === 'wallet'}
                                     onSelect={setPaymentMethod}
                                     icon={<WalletOutlinedIcon />}
+                                />
+                                <PaymentOption
+                                    id="whatsapp"
+                                    title="Manual (WhatsApp)"
+                                    description="Transfer manual dan konfirmasi via WhatsApp"
+                                    isSelected={paymentMethod === 'whatsapp'}
+                                    onSelect={setPaymentMethod}
+                                    icon={<WhatsAppIcon />}
                                 />
                             </div>
 

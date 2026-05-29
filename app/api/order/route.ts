@@ -89,6 +89,8 @@ export async function POST(request: NextRequest) {
                         quantity: item.quantity,
                         image: item.image ?? null,
                         orderHash: orderNumber,
+                        paymentMethod,
+                        shippingInfo,
                     },
                 })
             )

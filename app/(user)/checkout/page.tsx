@@ -60,6 +60,7 @@ const CheckoutPage = () => {
     const [isAuthChecking, setIsAuthChecking] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [step, setStep] = useState(1);
+    const [isPaid, setIsPaid] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('va');
     const [orderNumber, setOrderNumber] = useState('');
     const [orderError, setOrderError] = useState('');
@@ -252,6 +253,9 @@ const CheckoutPage = () => {
                 const message = `Halo Admin Connexxa,\n\nSaya ingin mengonfirmasi pesanan dengan metode Manual (WhatsApp).\n\n*Nomor Pesanan:* ${data.orderNumber}\n*Total Tagihan:* ${formatPrice(total)}\n\n*Rincian Pesanan:*\n${itemList}\n\n*Dikirim ke:*\n${formData.firstName} ${formData.lastName}\n${formData.address}, ${formData.city} ${formData.postalCode}\n${formData.phone}\n\nMohon informasi rekening untuk transfer. Terima kasih.`;
                 const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
                 window.open(waUrl, '_blank');
+                setIsPaid(true);
+            } else {
+                setIsPaid(false);
             }
 
             setStep(3);
@@ -497,30 +501,85 @@ const CheckoutPage = () => {
                         </section>
                     )}
 
-                    {/* STEP 3 — Konfirmasi Berhasil */}
+                    {/* STEP 3 — Konfirmasi Berhasil & Invoice */}
                     {step === 3 && (
                         <section className="step-content">
-                            <div className="py-10 flex flex-col items-center text-center">
-                                <div className="mb-6">
-                                    {/* <CheckCircleOutlineIcon sx={{ fontSize: 72, color: 'black' }} /> */}
+                            {!isPaid ? (
+                                <div className="py-10 flex flex-col items-center text-center">
+                                    <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-3">
+                                        Selesaikan Pembayaran
+                                    </h2>
+                                    <p className="text-[12px] text-gray-500 uppercase tracking-widest mb-6">
+                                        Silakan selesaikan pembayaran sesuai metode yang Anda pilih
+                                    </p>
+
+                                    <div className="my-6 w-full max-w-md border-2 border-black p-6 text-left bg-white">
+                                        <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Tagihan</span>
+                                            <span className="text-2xl font-black italic tracking-tighter">{formatPrice(total)}</span>
+                                        </div>
+                                        
+                                        <div className="mb-4">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1">Nomor Pesanan</span>
+                                            <span className="text-[14px] font-bold">{orderNumber}</span>
+                                        </div>
+                                        
+                                        <div className="mb-6">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1">Metode Pembayaran</span>
+                                            <span className="text-[14px] font-bold uppercase tracking-widest">
+                                                {paymentMethod === 'va' ? 'Virtual Account' : paymentMethod === 'cc' ? 'Kartu Kredit / Debit' : paymentMethod === 'wallet' ? 'E-Wallet' : paymentMethod}
+                                            </span>
+                                        </div>
+
+                                        {paymentMethod === 'va' && (
+                                            <div className="mb-6 p-4 bg-gray-50 border border-gray-200 text-center">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-2">Nomor Virtual Account</span>
+                                                <span className="text-xl font-black tracking-widest">8077 1234 5678 9012</span>
+                                            </div>
+                                        )}
+
+                                        {paymentMethod === 'wallet' && (
+                                            <div className="mb-6 p-4 bg-gray-50 border border-gray-200 text-center">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-2">Pindai QRIS Berikut</span>
+                                                <div className="w-48 h-48 bg-gray-200 mx-auto flex items-center justify-center border-2 border-dashed border-gray-400">
+                                                    <span className="text-[10px] text-gray-500 font-bold uppercase">QRIS Dummy</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <ButtonDark 
+                                            text="Simulasi Bayar Berhasil" 
+                                            fullWidth 
+                                            onClick={() => {
+                                                setIsPaid(true);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }} 
+                                        />
+                                    </div>
                                 </div>
-                                <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-3">
-                                    Pesanan Diterima!
-                                </h2>
-                                <p className="text-[12px] text-gray-500 uppercase tracking-widest mb-2">
-                                    Terima kasih telah berbelanja di Connexxa
-                                </p>
-                                <div className="my-6 px-8 py-4 border-2 border-black">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Nomor Pesanan</p>
-                                    <p className="text-2xl font-black italic tracking-tighter">{orderNumber}</p>
+                            ) : (
+                                <div className="py-10 flex flex-col items-center text-center">
+                                    <div className="mb-6">
+                                        {/* <CheckCircleOutlineIcon sx={{ fontSize: 72, color: 'black' }} /> */}
+                                    </div>
+                                    <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-3">
+                                        Pesanan Diterima!
+                                    </h2>
+                                    <p className="text-[12px] text-gray-500 uppercase tracking-widest mb-2">
+                                        Terima kasih telah berbelanja di Connexxa
+                                    </p>
+                                    <div className="my-6 px-8 py-4 border-2 border-black">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Nomor Pesanan</p>
+                                        <p className="text-2xl font-black italic tracking-tighter">{orderNumber}</p>
+                                    </div>
+                                    <p className="text-[11px] text-gray-400 uppercase tracking-wider mb-8 max-w-sm leading-relaxed">
+                                        Konfirmasi pesanan akan dikirim ke <span className="font-bold text-black">{formData.email}</span>. Estimasi pengiriman 2–4 hari kerja.
+                                    </p>
+                                    <Link href="/">
+                                        <ButtonDark text="Lanjut Belanja" />
+                                    </Link>
                                 </div>
-                                <p className="text-[11px] text-gray-400 uppercase tracking-wider mb-8 max-w-sm leading-relaxed">
-                                    Konfirmasi pesanan akan dikirim ke <span className="font-bold text-black">{formData.email}</span>. Estimasi pengiriman 2–4 hari kerja.
-                                </p>
-                                <Link href="/">
-                                    <ButtonDark text="Lanjut Belanja" />
-                                </Link>
-                            </div>
+                            )}
                         </section>
                     )}
 
@@ -618,7 +677,7 @@ const CheckoutPage = () => {
                                     <div className="text-center py-6">
                                         {/* <CheckCircleOutlineIcon sx={{ fontSize: 40, color: '#ccc' }} /> */}
                                         <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                                            Semua item berhasil di-order
+                                            {isPaid ? 'Semua item berhasil di-order' : 'Menunggu Pembayaran'}
                                         </p>
                                     </div>
                                 ) : (

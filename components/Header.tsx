@@ -4,8 +4,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
@@ -13,6 +11,8 @@ import Menu from './Menu';
 import Modal from './Modal';
 import FormInput from './FormInput';
 import NavLink from './NavLink';
+import CartPreview from './CartPreview';
+import SearchBar from './SearchBar';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -391,15 +391,9 @@ const Header = () => {
 
                 {/* Right Side Icons & Search */}
                 <div className="flex items-center space-x-2 lg:space-x-5">
+
                     {/* Desktop Search Bar */}
-                    <div className="hidden lg:flex items-center bg-[#eaebed] px-3 py-1.5 w-[190px] relative transition-all border border-transparent focus-within:border-gray-400">
-                        <input
-                            type="text"
-                            placeholder="Cari"
-                            className="bg-transparent text-[13px] focus:outline-none w-full placeholder:text-gray-500 font-medium"
-                        />
-                        <SearchIcon sx={{ fontSize: 20, color: '#000000' }} />
-                    </div>
+                    <SearchBar />
 
                     <div className="flex items-center space-x-2 lg:space-x-4">
                         {user ? (
@@ -444,92 +438,20 @@ const Header = () => {
                         </button>
 
                         {/* Implementasi Cart */}
-                        <div
-                            className="relative"
+                        <CartPreview
+                            isOpen={isCartPreviewOpen}
+                            isLoading={isCartLoading}
+                            items={cartItems}
+                            totalItems={cartCount}
+                            totalPrice={cartTotalPrice}
+                            removingItemId={removingCartItemId}
                             onMouseEnter={handleCartPreviewOpen}
                             onMouseLeave={handleCartPreviewClose}
-                            onClick={() => router.push('/cart')}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <div className="relative p-1 hover:bg-gray-100 rounded-sm transition-colors cursor-pointer">
-                                <ShoppingBagOutlinedIcon sx={{ fontSize: 24 }} />
-                                <span className="absolute -bottom-1 -right-1 bg-[#0071ae] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{cartCount}</span>
-                            </div>
-
-                            {isCartPreviewOpen && (
-                                <div className="absolute right-0 top-full mt-3 w-[calc(100vw-2rem)] max-w-[360px] bg-white border border-gray-200 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50">
-                                    <div className="absolute inset-x-0 -top-3 h-3" />
-                                    <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                                        <div>
-                                            <p className="text-[11px] font-black uppercase tracking-widest text-black">Tas Belanja</p>
-                                            <p className="text-[11px] text-gray-500 mt-1">{cartCount} item di tas</p>
-                                        </div>
-                                        <span className="text-[11px] font-bold text-black">{formatCurrency(cartTotalPrice)}</span>
-                                    </div>
-
-                                    <div className="max-h-[360px] overflow-y-auto">
-                                        {isCartLoading ? (
-                                            <div className="px-4 py-10 text-center text-[11px] font-bold uppercase tracking-widest text-gray-500 animate-pulse">
-                                                Memuat tas...
-                                            </div>
-                                        ) : cartItems.length === 0 ? (
-                                            <div className="px-4 py-10 text-center">
-                                                <p className="text-[11px] font-bold uppercase tracking-widest text-black">Tas masih kosong</p>
-                                                <p className="text-[11px] text-gray-500 mt-2">Tambah produk untuk mulai belanja.</p>
-                                            </div>
-                                        ) : (
-                                            cartItems.map((item) => (
-                                                <div key={item.id} className="px-4 py-3 border-b border-gray-100 last:border-b-0 flex gap-3">
-                                                    <div className="relative w-16 h-16 flex-shrink-0 bg-[#ebedee] overflow-hidden">
-                                                        {item.image ? (
-                                                            <Image
-                                                                src={item.image}
-                                                                alt={item.title}
-                                                                fill
-                                                                sizes="64px"
-                                                                className="object-cover"
-                                                            />
-                                                        ) : null}
-                                                    </div>
-
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="flex items-start justify-between gap-3">
-                                                            <p className="text-[11px] font-bold uppercase tracking-wide text-black truncate">
-                                                                {item.title}
-                                                            </p>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => void handleRemoveCartItem(item.id)}
-                                                                disabled={removingCartItemId === item.id}
-                                                                className="flex-shrink-0 text-[10px] font-black uppercase tracking-widest text-black underline underline-offset-4 hover:no-underline disabled:text-gray-400 disabled:no-underline"
-                                                            >
-                                                                {removingCartItemId === item.id ? 'Proses...' : 'Hapus'}
-                                                            </button>
-                                                        </div>
-                                                        <p className="text-[11px] text-gray-500 mt-1">
-                                                            Ukuran {item.size} • {item.color}
-                                                        </p>
-                                                        <div className="mt-2 flex items-center justify-between gap-3">
-                                                            <span className="text-[11px] text-gray-500">Qty {item.quantity}</span>
-                                                            <span className="text-[11px] font-bold text-black">
-                                                                {formatCurrency(item.price * item.quantity)}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-
-                                    {!isCartLoading && cartItems.length > 0 && (
-                                        <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
-                                            <span className="text-[11px] font-black uppercase tracking-widest text-black">Total</span>
-                                            <span className="text-[12px] font-black text-black">{formatCurrency(cartTotalPrice)}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                            onRemoveItem={(id) => void handleRemoveCartItem(id)}
+                            onCartClick={() => router.push('/cart')}
+                            formatCurrency={formatCurrency}
+                            cartCount={cartCount}
+                        />
 
                     </div>
                 </div>

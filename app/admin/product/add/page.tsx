@@ -19,6 +19,7 @@ export default function AddProductPage() {
     const [productSku, setProductSku] = useState<string>('');
     const [productCategory, setProductCategory] = useState<string>('footwear');
     const [productColors, setProductColors] = useState<string>('');
+    const [productGender, setProductGender] = useState<string>('male');
     const [productImage, setProductImage] = useState<File[]>([]);
     const [productSizes, setProductSizes] = useState<string[]>(['S', 'M', 'L', 'XL']);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -95,38 +96,40 @@ export default function AddProductPage() {
             }
 
             // 2. Kirim data ke API
-            const response = await fetch('/api/admin/product', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    title: productName,
-                    description: productDescription,
-                    price: productPrice,
-                    stock: productStock,
-                    sku: productSku,
-                    categorySlug: productCategory,
-                    colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
-                    sizes: selectedSizes,
-                    images: uploadedImageUrls, 
-                }),
-            });
+             const response = await fetch('/api/admin/product', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify({
+                     title: productName,
+                     description: productDescription,
+                     price: productPrice,
+                     stock: productStock,
+                     sku: productSku,
+                     categorySlug: productCategory,
+                     colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
+                     sizes: selectedSizes,
+                     gender: productGender,
+                     images: uploadedImageUrls, 
+                 }),
+             });
             
             const data = await response.json();
             if (response.ok) {
-                router.push('/admin/product');
-                // Reset form
-                setProductName('');
-                setProductDescription('');
-                setProductPrice('');
-                setProductStock('');
-                setProductSku('');
-                setProductCategory('footwear');
-                setProductColors('');
-                setSelectedSizes([]);
-                setProductImage([]);
-            } else {
+                 router.push('/admin/product');
+                 // Reset form
+                 setProductName('');
+                 setProductDescription('');
+                 setProductPrice('');
+                 setProductStock('');
+                 setProductSku('');
+                 setProductCategory('footwear');
+                 setProductColors('');
+                 setProductGender('male');
+                 setSelectedSizes([]);
+                 setProductImage([]);
+             } else {
                 console.error("API Error:", data);
                 alert(`Gagal menyimpan produk: ${data.message || data.error || 'Terjadi kesalahan server'}`);
             }
@@ -253,19 +256,30 @@ export default function AddProductPage() {
                             <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8 pb-4 border-b-4 border-black">Varian</h2>
 
                             <div className="space-y-6">
-                                <div>
-                                    <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Kategori</label>
-                                    <select
-                                        value={productCategory}
-                                        onChange={handleProductCategoryChange}
-                                        className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-[12px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none"
-                                    >
-                                        <option value="footwear">Footwear (Sepatu)</option>
-                                        <option value="apparel">Apparel (Pakaian)</option>
-                                        <option value="equipment">Equipment (Peralatan)</option>
-                                        <option value="accessories">Accessories (Aksesoris)</option>
-                                    </select>
-                                </div>
+                                 <div>
+                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Kategori</label>
+                                     <select
+                                         value={productCategory}
+                                         onChange={handleProductCategoryChange}
+                                         className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-[12px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none"
+                                     >
+                                         <option value="footwear">Footwear (Sepatu)</option>
+                                         <option value="apparel">Apparel (Pakaian)</option>
+                                         <option value="equipment">Equipment (Peralatan)</option>
+                                         <option value="accessories">Accessories (Aksesoris)</option>
+                                     </select>
+                                 </div>
+                                 <div>
+                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Gender</label>
+                                     <select
+                                         value={productGender}
+                                         onChange={(e) => setProductGender(e.target.value)}
+                                         className="w-full bg-gray-50 border-2 border-transparent hover:border-black focus:border-black px-6 py-4 text-[12px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none"
+                                     >
+                                         <option value="male">Male</option>
+                                         <option value="female">Female</option>
+                                     </select>
+                                 </div>
 
                                 <div>
                                     <label className="block text-[11px] font-black uppercase text-gray-500 tracking-[0.2em] mb-3">Warna (Pisahkan dengan koma)</label>

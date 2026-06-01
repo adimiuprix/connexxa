@@ -21,13 +21,7 @@ const categories = [
         philosophy: 'KEANGGUNAN TANPA BATAS',
         href: '/wanita',
     },
-    {
-        title: 'ANAK',
-        image: '/who-search/anak/anak-1.png',
-        hoverImage: '/who-search/anak/anak-2.png',
-        philosophy: 'IMAJINASI UNTUK MASA DEPAN',
-        href: '/anak',
-    },
+
 ];
 
 const CategoryCard = ({ cat }: { cat: any }) => {
@@ -183,7 +177,7 @@ const CategoryGrid = () => {
             <h2 className="text-3xl md:text-4xl font-black italic mb-8 tracking-tighter uppercase text-black">
                 SIAPA YANG KAMU CARI?
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {categories.map((cat) => (
                     <CategoryCard key={cat.title} cat={cat} />
                 ))}

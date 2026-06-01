@@ -15,18 +15,19 @@ export default function EditProductPage() {
     const params = useParams();
     const productId = params.id as string;
 
-    const [productName, setProductName] = useState<string>('');
-    const [productDescription, setProductDescription] = useState<string>('');
-    const [productPrice, setProductPrice] = useState<string>('');
-    const [productStock, setProductStock] = useState<string>('');
-    const [productSku, setProductSku] = useState<string>('');
-    const [productCategory, setProductCategory] = useState<string>('footwear');
-    const [productColors, setProductColors] = useState<string>('');
-    const [productImage, setProductImage] = useState<File[]>([]);
-    const [existingImages, setExistingImages] = useState<string[]>([]);
-    const [productSizes, setProductSizes] = useState<string[]>(['S', 'M', 'L', 'XL']);
-    const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+     const [productName, setProductName] = useState<string>('');
+     const [productDescription, setProductDescription] = useState<string>('');
+     const [productPrice, setProductPrice] = useState<string>('');
+     const [productStock, setProductStock] = useState<string>('');
+     const [productSku, setProductSku] = useState<string>('');
+     const [productCategory, setProductCategory] = useState<string>('footwear');
+     const [productColors, setProductColors] = useState<string>('');
+     const [productGender, setProductGender] = useState<string>('');
+     const [productImage, setProductImage] = useState<File[]>([]);
+     const [existingImages, setExistingImages] = useState<string[]>([]);
+     const [productSizes, setProductSizes] = useState<string[]>(['S', 'M', 'L', 'XL']);
+     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -40,8 +41,9 @@ export default function EditProductPage() {
                     setProductStock(data.stock.toString());
                     setProductSku(data.sku);
                     setProductCategory(data.category?.slug || 'footwear');
-                    setProductColors(data.colors?.join(', ') || '');
-                    setExistingImages(data.images || []);
+                     setProductColors(data.colors?.join(', ') || '');
+                     setProductGender(data.gender ?? '');
+                     setExistingImages(data.images || []);
                     
                     if (data.sizes) {
                         const sizes = data.sizes.map((ps: any) => ps.size.value);
@@ -90,17 +92,18 @@ export default function EditProductPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    title: productName,
-                    description: productDescription,
-                    price: productPrice,
-                    stock: productStock,
-                    sku: productSku,
-                    categorySlug: productCategory,
-                    colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
-                    sizes: selectedSizes,
-                    images: combinedImages, 
-                }),
+                 body: JSON.stringify({
+                     title: productName,
+                     description: productDescription,
+                     price: productPrice,
+                     stock: productStock,
+                     sku: productSku,
+                     categorySlug: productCategory,
+                     colors: productColors.split(',').map(c => c.trim()).filter(c => c !== ''),
+                     sizes: selectedSizes,
+                     gender: productGender === '' ? null : productGender,
+                     images: combinedImages, 
+                 }),
             });
 
             if (response.ok) {
@@ -270,19 +273,30 @@ export default function EditProductPage() {
                             <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8 pb-4 border-b-4 border-black">Varian</h2>
                             
                             <div className="space-y-6">
-                                <div>
-                                    <label className="block text-[11px] font-black uppercase text-black tracking-widest mb-3">Kategori</label>
-                                    <select 
-                                        value={productCategory} 
-                                        onChange={(e) => setProductCategory(e.target.value)}
-                                        className="w-full bg-gray-50 border border-gray-200 hover:border-black focus:border-black px-6 py-4 text-[11px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none tracking-widest"
-                                    >
-                                        <option value="footwear">Footwear (Sepatu)</option>
-                                        <option value="apparel">Apparel (Pakaian)</option>
-                                        <option value="equipment">Equipment (Peralatan)</option>
-                                        <option value="accessories">Accessories (Aksesoris)</option>
-                                    </select>
-                                </div>
+                                 <div>
+                                     <label className="block text-[11px] font-black uppercase text-black tracking-widest mb-3">Kategori</label>
+                                     <select 
+                                         value={productCategory} 
+                                         onChange={(e) => setProductCategory(e.target.value)}
+                                         className="w-full bg-gray-50 border border-gray-200 hover:border-black focus:border-black px-6 py-4 text-[11px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none tracking-widest"
+                                     >
+                                         <option value="footwear">Footwear (Sepatu)</option>
+                                         <option value="apparel">Apparel (Pakaian)</option>
+                                         <option value="equipment">Equipment (Peralatan)</option>
+                                         <option value="accessories">Accessories (Aksesoris)</option>
+                                     </select>
+                                 </div>
+                                 <div>
+                                     <label className="block text-[11px] font-black uppercase text-black tracking-widest mb-3">Gender</label>
+                                     <select 
+                                         value={productGender} 
+                                         onChange={(e) => setProductGender(e.target.value)}
+                                         className="w-full bg-gray-50 border border-gray-200 hover:border-black focus:border-black px-6 py-4 text-[11px] font-black italic uppercase outline-none transition-all cursor-pointer appearance-none tracking-widest"
+                                     >
+                                         <option value="male">Male</option>
+                                         <option value="female">Female</option>
+                                     </select>
+                                 </div>
 
                                 <FormInput
                                     label="Warna (Pisahkan koma)"

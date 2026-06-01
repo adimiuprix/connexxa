@@ -113,6 +113,7 @@ async function main() {
             ],
             // Mengaitkan produk ini dengan kategori Apparel
             categoryId: categories.find(c => c.slug === 'apparel')?.id,
+            gender: "male",
         },
     ];
 

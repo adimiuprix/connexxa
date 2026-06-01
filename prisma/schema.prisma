@@ -47,6 +47,7 @@ model Product {
     category    Category?     @relation(fields: [categoryId], references: [id])
     categoryId  Int?
     orders      Order[]
+    gender      Gender?
 }
 
 model Size {
@@ -122,6 +123,11 @@ model Wishlist {
 enum Availability {
     true
     false
+}
+
+enum Gender {
+    male
+    female
 }
 
 model Order {

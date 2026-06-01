@@ -3,10 +3,9 @@ import Link from 'next/link';
 import CloseIcon from '@mui/icons-material/Close';
 
 const menuItems = [
-    { label: 'PRIA', href: '/#' },
-    { label: 'WANITA', href: '/#' },
-    { label: 'ANAK', href: '/#' },
-    { label: 'SALE', href: '/#' },
+    { label: 'PRIA', href: '/pria' },
+    { label: 'WANITA', href: '/wanita' },
+    { label: 'SALE', href: '/sale' },
     { label: "COMMING SOON", href: "/#" }
 ];
 

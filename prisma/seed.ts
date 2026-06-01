@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient, Gender } from "../generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import "dotenv/config";
@@ -113,15 +113,20 @@ async function main() {
             ],
             // Mengaitkan produk ini dengan kategori Apparel
             categoryId: categories.find(c => c.slug === 'apparel')?.id,
-            gender: "male",
+            gender: Gender.male,
         },
     ];
 
     for (const productData of productsData) {
+        const { categoryId, ...rest } = productData;
+        const data = categoryId !== undefined
+            ? { ...rest, categoryId }
+            : rest;
+
         const product = await prisma.product.upsert({
             where: { sku: productData.sku },
-            update: productData,
-            create: productData,
+            update: data,
+            create: data,
         });
 
         // 4. Associate with Sizes

@@ -27,7 +27,7 @@ const Footer = () => {
         {
             title: 'DUKUNGAN',
             links: ['Bantuan', 'Pelacak Pesanan', 'Pencari Toko', 'Pengembalian'],
-            hrefs: ['/bantuan', '#', '#', '#'],
+            hrefs: ['/bantuan', '/pelacak-pesanan', '/pencari-toko', '#'],
         },
         {
             title: 'INFO PERUSAHAAN',

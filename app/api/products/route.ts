@@ -2,38 +2,48 @@ import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { createClient } from "@/libs/supabaseServer";
 
-export async function GET() {
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+export async function GET(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const query = searchParams.get("q")?.trim() ?? "";
 
-    const products = await prisma.product.findMany({
-      take: 10,
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-    let wishlistProductIds: number[] = [];
-    if (user) {
-      const wishlists = await prisma.wishlist.findMany({
-        where: { userId: user.id },
-        select: { productId: true },
-      });
-      wishlistProductIds = wishlists.map((w) => w.productId);
+        const products = await prisma.product.findMany({
+            where: query
+                ? {
+                    OR: [
+                        { title: { contains: query, mode: "insensitive" } },
+                        { description: { contains: query, mode: "insensitive" } },
+                        { sku: { contains: query, mode: "insensitive" } },
+                    ],
+                }
+                : undefined,
+            take: query ? 20 : 10,
+            orderBy: { createdAt: "desc" },
+        });
+
+        let wishlistProductIds: number[] = [];
+        if (user) {
+            const wishlists = await prisma.wishlist.findMany({
+                where: { userId: user.id },
+                select: { productId: true },
+            });
+            wishlistProductIds = wishlists.map((w) => w.productId);
+        }
+
+        const productsWithWishlist = products.map((product) => ({
+            ...product,
+            isWishlisted: wishlistProductIds.includes(product.id),
+        }));
+
+        return NextResponse.json(productsWithWishlist);
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return NextResponse.json(
+            { error: "Failed to fetch products" },
+            { status: 500 }
+        );
     }
-
-    const productsWithWishlist = products.map((product) => ({
-      ...product,
-      isWishlisted: wishlistProductIds.includes(product.id),
-    }));
-
-    return NextResponse.json(productsWithWishlist);
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch products" },
-      { status: 500 }
-    );
-  }
 }

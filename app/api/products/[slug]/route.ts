@@ -22,6 +22,7 @@ export async function GET(
                     },
                 },
                 reviews: true,
+                category: true,
             },
         });
 

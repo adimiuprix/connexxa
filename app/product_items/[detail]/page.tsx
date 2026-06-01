@@ -202,10 +202,32 @@ const Page = () => {
             <nav className="px-4 lg:px-12 py-3 text-[11px] tracking-wider text-gray-500 uppercase">
                 <ol className="flex items-center gap-2">
                     <li><Link href="/" className="hover:text-black transition-colors">Beranda</Link></li>
-                    <li>/</li>
-                    <li><Link href="/" className="hover:text-black transition-colors">Wanita</Link></li>
-                    <li>/</li>
-                    <li><Link href="/" className="hover:text-black transition-colors">Pakaian</Link></li>
+                    {product.gender && (
+                        <>
+                            <li>/</li>
+                            <li>
+                                <Link
+                                    href={product.gender === 'male' ? '/pria' : '/wanita'}
+                                    className="hover:text-black transition-colors"
+                                >
+                                    {product.gender === 'male' ? 'Pria' : 'Wanita'}
+                                </Link>
+                            </li>
+                        </>
+                    )}
+                    {product.category && (
+                        <>
+                            <li>/</li>
+                            <li>
+                                <Link
+                                    href={`/category/${product.category.slug}`}
+                                    className="hover:text-black transition-colors"
+                                >
+                                    {product.category.name}
+                                </Link>
+                            </li>
+                        </>
+                    )}
                     <li>/</li>
                     <li className="text-black font-semibold">{product.title}</li>
                 </ol>
@@ -252,7 +274,7 @@ const Page = () => {
                                 priority
                             />
                             {/* Wishlist button on image */}
-                            <button 
+                            <button
                                 onClick={handleAddToWishlist}
                                 className={`absolute top-4 right-4 w-10 h-10 flex items-center justify-center transition-all duration-200 ${isWishlisted ? 'bg-black text-white' : 'bg-white text-black'} hover:scale-110 active:scale-95 shadow-md`}
                             >
@@ -267,7 +289,12 @@ const Page = () => {
 
                     {/* Category badge */}
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[11px] font-semibold tracking-widest text-gray-500 uppercase">Wanita • Pakaian</span>
+                        <span className="text-[11px] font-semibold tracking-widest text-gray-500 uppercase">
+                            {[
+                                product.gender === 'male' ? 'Pria' : product.gender === 'female' ? 'Wanita' : null,
+                                product.category?.name ?? null,
+                            ].filter(Boolean).join(' • ')}
+                        </span>
                     </div>
 
                     {/* Product Title */}
@@ -344,8 +371,8 @@ const Page = () => {
                             </p>
                         )}
 
-                        <button 
-                            onClick={handleAddToWishlist} 
+                        <button
+                            onClick={handleAddToWishlist}
                             className={`w-full h-[52px] font-bold uppercase tracking-widest text-[13px] flex items-center justify-center gap-3 transition-all duration-200 border border-black ${isWishlisted ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'}`}
                         >
                             <FavoriteBorderIcon sx={{ fontSize: 18, color: isWishlisted ? 'white' : 'inherit' }} />

@@ -86,7 +86,7 @@ const Footer = () => {
             {/* Bottom Bar */}
             <div className="bg-[#282c31] text-[#919496] py-6 text-center text-[11px] font-medium">
                 <div className="max-w-[1920px] mx-auto px-4 flex flex-col md:flex-row justify-center items-center md:space-x-8 space-y-4 md:space-y-0">
-                    <Link href="#" className="hover:text-white hover:underline transition-colors">Kebijakan Privasi</Link>
+                    <Link href="/kebijakan-privasi" className="hover:text-white hover:underline transition-colors">Kebijakan Privasi</Link>
                     <span className="hidden md:block">|</span>
                     <Link href="/terms_and_conditions" className="hover:text-white hover:underline transition-colors">Syarat dan Ketentuan</Link>
                     <span className="hidden md:block">|</span>
